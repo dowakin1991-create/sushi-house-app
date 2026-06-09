@@ -64,18 +64,22 @@
         h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px;}
 
         .action-buttons {
-            display: flex; justify-content: space-between; gap: 10px; margin-bottom: 16px;
+            display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px;
         }
 
         .btn-secondary {
             flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            color: var(--text-main); border-radius: 14px; padding: 10px 0;
-            font-size: 15px; font-weight: 600; cursor: pointer;
+            color: var(--text-main); border-radius: 14px; padding: 10px 2px;
+            font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
             -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
             transition: opacity 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; height: 50px;
         }
-        .btn-secondary:active { opacity: 0.6; }
         
+        .btn-secondary span { font-size: 18px; } /* Розмір емодзі */
+        
+        .btn-secondary:active { opacity: 0.6; }
         .btn-secondary.active { color: var(--danger); border-color: var(--danger); }
 
         .glass-panel {
@@ -146,8 +150,9 @@
     </div>
 
     <div class="action-buttons">
-        <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()">✏️ Редагувати список</button>
-        <button class="btn-secondary" onclick="clearCounts()">🔄 Очистити цифри</button>
+        <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>Алфавіт</button>
+        <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()"><span>✏️</span>Редагувати</button>
+        <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити</button>
     </div>
 
     <div class="glass-panel" id="list-panel">
@@ -179,7 +184,6 @@
 
         let appItems = [];
 
-        // Завантаження даних з пам'яті
         function loadData() {
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
@@ -190,7 +194,6 @@
             }
         }
 
-        // Збереження даних у пам'ять
         function saveData() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
         }
@@ -220,7 +223,7 @@
         function updateCount(index, value) {
             if (value < 0) value = 0;
             appItems[index].count = value;
-            saveData(); // Зберігаємо відразу при вводі
+            saveData();
         }
 
         function addNewItem() {
@@ -253,17 +256,27 @@
             if (isEditMode) {
                 panel.classList.add('edit-mode');
                 btn.classList.add('active');
-                btn.innerHTML = '✓ Завершити';
+                btn.innerHTML = '<span>✓</span>Готово';
             } else {
                 panel.classList.remove('edit-mode');
                 btn.classList.remove('active');
-                btn.innerHTML = '✏️ Редагувати список';
+                btn.innerHTML = '<span>✏️</span>Редагувати';
             }
         }
 
         function clearCounts() {
             if (confirm('Очистити всі введені кількості?')) {
                 appItems.forEach(item => item.count = '');
+                saveData();
+                renderItems();
+            }
+        }
+
+        // Нова функція сортування
+        function sortItems() {
+            if (confirm('Відсортувати всі інгредієнти за алфавітом?')) {
+                // localeCompare з 'uk' гарантує правильне сортування українських літер
+                appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
                 saveData();
                 renderItems();
             }
@@ -290,7 +303,6 @@
             window.location.href = `viber://forward?text=${encodedText}`;
         }
 
-        // Запуск при відкритті
         loadData();
         renderItems();
     </script>
