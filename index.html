@@ -10,15 +10,8 @@
     <title>Замовлення СушіХаус</title>
 
     <style>
-        /* Оптимізація та базові стилі */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* Системна світла тема */
         :root {
             --bg-color: #f2f2f7;
             --glass-bg: rgba(255, 255, 255, 0.6);
@@ -26,12 +19,12 @@
             --text-main: #000000;
             --text-secondary: #8e8e93;
             --accent: #ff6b00;
+            --danger: #ff3b30;
             --input-bg: rgba(0, 0, 0, 0.05);
             --item-border: rgba(0, 0, 0, 0.1);
             --shadow: rgba(0, 0, 0, 0.08);
         }
 
-        /* Системна темна тема (автоматично реагує на налаштування телефону) */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #000000;
@@ -40,6 +33,7 @@
                 --text-main: #ffffff;
                 --text-secondary: #ebebf5;
                 --accent: #ff8c33;
+                --danger: #ff453a;
                 --input-bg: rgba(255, 255, 255, 0.1);
                 --item-border: rgba(255, 255, 255, 0.1);
                 --shadow: rgba(0, 0, 0, 0.5);
@@ -55,165 +49,93 @@
             background-attachment: fixed;
             min-height: 100vh;
             padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px) 16px;
-            /* Плавний скролінг iOS 120Hz */
             -webkit-overflow-scrolling: touch; 
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
+        .header { text-align: center; margin-bottom: 16px; position: relative; }
+        
         .logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 24px;
-            box-shadow: 0 8px 24px var(--shadow);
-            margin-bottom: 12px;
-            background: var(--glass-bg);
+            width: 90px; height: 90px; border-radius: 22px; box-shadow: 0 8px 24px var(--shadow);
+            margin-bottom: 12px; background: var(--glass-bg);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            backdrop-filter: blur(20px) saturate(180%);
-            object-fit: cover;
+            backdrop-filter: blur(20px) saturate(180%); object-fit: cover;
         }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px;}
+
+        .action-buttons {
+            display: flex; justify-content: space-between; gap: 10px; margin-bottom: 16px;
         }
 
-        /* Стиль рідкого скла Apple (Glassmorphism) */
+        .btn-secondary {
+            flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-main); border-radius: 14px; padding: 10px 0;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            transition: opacity 0.2s;
+        }
+        .btn-secondary:active { opacity: 0.6; }
+        
+        .btn-secondary.active { color: var(--danger); border-color: var(--danger); }
+
         .glass-panel {
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            backdrop-filter: blur(24px) saturate(180%);
-            box-shadow: 0 10px 30px var(--shadow);
-            padding: 16px;
-            margin-bottom: 20px;
-            /* Апаратне прискорення 120Hz */
+            background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);
+            -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: 0 10px 30px var(--shadow); padding: 16px; margin-bottom: 20px;
             transform: translateZ(0); 
         }
 
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .list-container { display: flex; flex-direction: column; gap: 12px; }
 
         .item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--item-border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 12px; border-bottom: 1px solid var(--item-border);
+            transition: all 0.3s ease;
         }
 
-        .item-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
+        .item-row:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .item-name {
-            font-size: 17px;
-            font-weight: 500;
-            flex: 1;
-        }
+        .item-name { font-size: 17px; font-weight: 500; flex: 1; }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .controls { display: flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
 
         input[type="number"] {
-            width: 60px;
-            height: 36px;
-            background: var(--input-bg);
-            border: none;
-            border-radius: 10px;
-            color: var(--text-main);
-            font-size: 17px;
-            font-weight: 600;
-            text-align: center;
-            font-family: inherit;
-            /* Видалення стрілочок у Chrome/Safari */
-            -moz-appearance: textfield;
+            width: 60px; height: 36px; background: var(--input-bg); border: none;
+            border-radius: 10px; color: var(--text-main); font-size: 17px;
+            font-weight: 600; text-align: center; font-family: inherit; -moz-appearance: textfield;
         }
-        
         input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .unit { font-size: 15px; color: var(--text-secondary); font-weight: 500; width: 24px; }
+
+        .delete-btn {
+            background: var(--danger); color: white; border: none; border-radius: 10px;
+            width: 36px; height: 36px; font-size: 18px; font-weight: bold;
+            display: none; justify-content: center; align-items: center; cursor: pointer;
         }
 
-        .unit {
-            font-size: 15px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            width: 24px;
-        }
+        /* Стан редагування */
+        .edit-mode .controls { display: none; }
+        .edit-mode .delete-btn { display: flex; }
 
-        .add-custom {
-            display: flex;
-            gap: 10px;
-        }
-
+        .add-custom { display: flex; gap: 10px; }
         .add-custom input[type="text"] {
-            flex: 1;
-            height: 44px;
-            background: var(--input-bg);
-            border: none;
-            border-radius: 12px;
-            padding: 0 16px;
-            color: var(--text-main);
-            font-size: 17px;
-            font-family: inherit;
+            flex: 1; height: 44px; background: var(--input-bg); border: none;
+            border-radius: 12px; padding: 0 16px; color: var(--text-main); font-size: 17px;
         }
-
-        .add-custom input::placeholder {
-            color: var(--text-secondary);
-        }
-
         .btn-add {
-            background: var(--input-bg);
-            color: var(--accent);
-            border: none;
-            border-radius: 12px;
-            padding: 0 20px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn-add:active {
-            opacity: 0.6;
+            background: var(--input-bg); color: var(--accent); border: none;
+            border-radius: 12px; padding: 0 20px; font-size: 17px; font-weight: 600;
         }
 
         .btn-submit {
-            width: 100%;
-            height: 54px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 14px rgba(255, 107, 0, 0.4);
-            transition: transform 0.1s, opacity 0.2s;
-            margin-bottom: 20px;
+            width: 100%; height: 54px; background: var(--accent); color: #fff;
+            border: none; border-radius: 16px; font-size: 17px; font-weight: 600;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 14px rgba(255, 107, 0, 0.4); margin-bottom: 20px;
         }
-
-        .btn-submit:active {
-            transform: scale(0.97);
-            opacity: 0.9;
-        }
+        .btn-submit:active { transform: scale(0.97); opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -223,14 +145,18 @@
         <h1>Замовлення</h1>
     </div>
 
-    <div class="glass-panel">
-        <div class="list-container" id="items-list">
-            </div>
+    <div class="action-buttons">
+        <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()">✏️ Редагувати список</button>
+        <button class="btn-secondary" onclick="clearCounts()">🔄 Очистити цифри</button>
+    </div>
+
+    <div class="glass-panel" id="list-panel">
+        <div class="list-container" id="items-list"></div>
     </div>
 
     <div class="glass-panel">
         <div class="add-custom">
-            <input type="text" id="new-item-input" placeholder="Інший інгредієнт...">
+            <input type="text" id="new-item-input" placeholder="Новий інгредієнт...">
             <button class="btn-add" onclick="addNewItem()">Додати</button>
         </div>
     </div>
@@ -238,6 +164,9 @@
     <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
 
     <script>
+        const STORAGE_KEY = 'sushiHouseItems_v1';
+        let isEditMode = false;
+
         const defaultItems = [
             "Лосось", "Копчений лосось", "Креветки", "Вугор", 
             "Крем-сир", "Кляр темпура", "Сухарі панко", "Соус Унагі", 
@@ -248,7 +177,23 @@
             "Макісу", "Листя комбо"
         ];
 
-        let appItems = defaultItems.map(name => ({ name: name, count: '' }));
+        let appItems = [];
+
+        // Завантаження даних з пам'яті
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                appItems = JSON.parse(savedData);
+            } else {
+                appItems = defaultItems.map(name => ({ name: name, count: '' }));
+                saveData();
+            }
+        }
+
+        // Збереження даних у пам'ять
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
+        }
 
         function renderItems() {
             const listContainer = document.getElementById('items-list');
@@ -266,6 +211,7 @@
                                oninput="updateCount(${index}, this.value)">
                         <span class="unit">шт</span>
                     </div>
+                    <button class="delete-btn" onclick="deleteItem(${index})">✕</button>
                 `;
                 listContainer.appendChild(row);
             });
@@ -274,6 +220,7 @@
         function updateCount(index, value) {
             if (value < 0) value = 0;
             appItems[index].count = value;
+            saveData(); // Зберігаємо відразу при вводі
         }
 
         function addNewItem() {
@@ -282,13 +229,43 @@
 
             if (itemName !== "") {
                 appItems.push({ name: itemName, count: '' });
+                saveData();
                 input.value = ''; 
                 renderItems(); 
                 
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        function deleteItem(index) {
+            if (confirm(`Видалити "${appItems[index].name}" зі списку?`)) {
+                appItems.splice(index, 1);
+                saveData();
+                renderItems();
+            }
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const panel = document.getElementById('list-panel');
+            const btn = document.getElementById('edit-btn');
+            
+            if (isEditMode) {
+                panel.classList.add('edit-mode');
+                btn.classList.add('active');
+                btn.innerHTML = '✓ Завершити';
+            } else {
+                panel.classList.remove('edit-mode');
+                btn.classList.remove('active');
+                btn.innerHTML = '✏️ Редагувати список';
+            }
+        }
+
+        function clearCounts() {
+            if (confirm('Очистити всі введені кількості?')) {
+                appItems.forEach(item => item.count = '');
+                saveData();
+                renderItems();
             }
         }
 
@@ -313,6 +290,8 @@
             window.location.href = `viber://forward?text=${encodedText}`;
         }
 
+        // Запуск при відкритті
+        loadData();
         renderItems();
     </script>
 </body>
