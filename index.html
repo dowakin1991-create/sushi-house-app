@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="СушіХаус">
+    <link rel="apple-touch-icon" href="image.png">
+    <title>Замовлення СушіХаус</title>
+
+    <style>
+        /* Оптимізація та базові стилі */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            /* Світла тема (за замовчуванням) */
+            --bg-color: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #000000;
+            --text-secondary: #8e8e93;
+            --accent: #ff6b00; /* Колір з логотипу */
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --item-border: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Темна тема */
+                --bg-color: #000000;
+                --glass-bg: rgba(28, 28, 30, 0.65);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --text-main: #ffffff;
+                --text-secondary: #ebebf5;
+                --accent: #ff8c33;
+                --input-bg: rgba(255, 255, 255, 0.1);
+                --item-border: rgba(255, 255, 255, 0.1);
+                --shadow: rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            /* Плавний градієнт для підкреслення ефекту скла */
+            background-image: radial-gradient(circle at 0% 0%, rgba(255, 107, 0, 0.15) 0%, transparent 50%), 
+                              radial-gradient(circle at 100% 100%, rgba(255, 107, 0, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px) 16px;
+            /* Плавний скролінг iOS 120Hz */
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px var(--shadow);
+            margin-bottom: 12px;
+            /* Ефект скла на самому лого */
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Стиль рідкого скла Apple (Glassmorphism) */
+        .glass-panel {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: 0 10px 30px var(--shadow);
+            padding: 16px;
+            margin-bottom: 20px;
+            /* Апаратне прискорення 120Hz */
+            transform: translateZ(0); 
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--item-border);
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .item-name {
+            font-size: 17px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            height: 36px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 17px;
+            font-weight: 600;
+            text-align: center;
+            font-family: inherit;
+            /* Видалення стрілочок у Chrome/Safari */
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .unit {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            width: 24px;
+        }
+
+        .add-custom {
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-custom input[type="text"] {
+            flex: 1;
+            height: 44px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 12px;
+            padding: 0 16px;
+            color: var(--text-main);
+            font-size: 17px;
+            font-family: inherit;
+        }
+
+        .add-custom input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn-add {
+            background: var(--input-bg);
+            color: var(--accent);
+            border: none;
+            border-radius: 12px;
+            padding: 0 20px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:active {
+            opacity: 0.6;
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 54px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 14px rgba(255, 107, 0, 0.4);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="image.png" alt="СушіХаус лого" class="logo">
+        <h1>Замовлення</h1>
+    </div>
+
+    <div class="glass-panel">
+        <div class="list-container" id="items-list">
+            </div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="add-custom">
+            <input type="text" id="new-item-input" placeholder="Інший інгредієнт...">
+            <button class="btn-add" onclick="addNewItem()">Додати</button>
+        </div>
+    </div>
+
+    <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
+
+    <script>
+        // Початковий список інгредієнтів
+        const defaultItems = [
+            "Лосось", "Копчений лосось", "Креветки", "Вугор", 
+            "Крем-сир", "Кляр темпура", "Сухарі панко", "Соус Унагі", 
+            "Горіховий соус", "Устричний соус", "Імбир", "Васабі", 
+            "Бейбі восьминіг", "Сніжний краб", "Ікра масаго", 
+            "Бамбукові листя", "Мірін", "Кікоман", "Рисовий оцет", 
+            "Чука", "Норі", "Палички", "Фіксатори", "Рис", 
+            "Макісу", "Листя комбо"
+        ];
+
+        // Масив об'єктів для зберігання стану
+        let appItems = defaultItems.map(name => ({ name: name, count: '' }));
+
+        // Функція відмальовування списку
+        function renderItems() {
+            const listContainer = document.getElementById('items-list');
+            listContainer.innerHTML = ''; // Очищення перед рендером
+
+            appItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                
+                row.innerHTML = `
+                    <div class="item-name">${item.name}</div>
+                    <div class="controls">
+                        <input type="number" inputmode="numeric" min="0" placeholder="0" 
+                               value="${item.count}" 
+                               oninput="updateCount(${index}, this.value)">
+                        <span class="unit">шт</span>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        // Оновлення значення в масиві при вводі
+        function updateCount(index, value) {
+            // Запобігаємо від'ємним значенням
+            if (value < 0) value = 0;
+            appItems[index].count = value;
+        }
+
+        // Функція додавання кастомного інгредієнта
+        function addNewItem() {
+            const input = document.getElementById('new-item-input');
+            const itemName = input.value.trim();
+
+            if (itemName !== "") {
+                appItems.push({ name: itemName, count: '' });
+                input.value = ''; // Очищаємо поле
+                renderItems(); // Перемальовуємо список
+                
+                // Прокрутка до низу списку
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Відправка у Viber
+        function sendToViber() {
+            let messageText = "Замовлення СушіХаус\n\n";
+            let hasOrders = false;
+
+            appItems.forEach(item => {
+                const count = parseInt(item.count);
+                if (!isNaN(count) && count > 0) {
+                    messageText += `${item.name}: ${count} шт\n`;
+                    hasOrders = true;
+                }
+            });
+
+            if (!hasOrders) {
+                alert("Будь ласка, вкажіть кількість хоча б для одного інгредієнта!");
+                return;
+            }
+
+            // Кодування тексту для URL (URI component)
+            const encodedText = encodeURIComponent(messageText);
+            
+            // Відкриття Viber з підготовленим текстом (формат для пересилання)
+            window.location.href = `viber://forward?text=${encodedText}`;
+        }
+
+        // Ініціалізація додатку
+        renderItems();
+    </script>
+</body>
+</html>
