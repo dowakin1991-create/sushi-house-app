@@ -63,6 +63,17 @@
 
         h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px;}
 
+        /* Панель пошуку */
+        .search-panel {
+            padding: 2px;
+            margin-bottom: 16px;
+        }
+        .search-panel input {
+            width: 100%; height: 44px; background: var(--input-bg); border: none;
+            border-radius: 14px; padding: 0 16px; color: var(--text-main); font-size: 16px;
+            font-family: inherit;
+        }
+
         .action-buttons {
             display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px;
         }
@@ -88,6 +99,12 @@
             transform: translateZ(0); 
         }
 
+        /* Стилі категорій */
+        .category-title {
+            font-size: 15px; font-weight: 700; color: var(--accent);
+            margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
         .list-container { display: flex; flex-direction: column; gap: 12px; }
 
         .item-row {
@@ -97,13 +114,9 @@
         }
 
         .item-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .item-row.skipped { opacity: 0.35; }
 
-        /* Стилі для пропущених інгредієнтів (сірі) */
-        .item-row.skipped {
-            opacity: 0.35;
-        }
-
-        .item-name { font-size: 17px; font-weight: 500; flex: 1; }
+        .item-name { font-size: 17px; font-weight: 500; flex: 1; padding-right: 8px; }
 
         .controls { display: flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
 
@@ -131,16 +144,26 @@
         }
 
         /* Стан редагування */
-        .edit-mode .controls { display: none; }
-        .edit-mode .delete-btn { display: flex; }
+        .edit-mode .controls { display: none !important; }
+        .edit-mode .delete-btn { display: flex !important; }
 
-        .add-custom { display: flex; gap: 10px; }
+        .add-custom { display: flex; flex-direction: column; gap: 10px; }
+        
+        .add-row { display: flex; gap: 10px; }
+        
         .add-custom input[type="text"] {
             flex: 1; height: 44px; background: var(--input-bg); border: none;
             border-radius: 12px; padding: 0 16px; color: var(--text-main); font-size: 17px;
         }
+        
+        .add-custom select {
+            height: 44px; background: var(--input-bg); border: none;
+            border-radius: 12px; padding: 0 8px; color: var(--text-main); font-size: 15px;
+            font-family: inherit; flex: 1; -webkit-appearance: none;
+        }
+
         .btn-add {
-            background: var(--input-bg); color: var(--accent); border: none;
+            height: 44px; background: var(--input-bg); color: var(--accent); border: none;
             border-radius: 12px; padding: 0 20px; font-size: 17px; font-weight: 600;
         }
 
@@ -160,37 +183,70 @@
         <h1>Замовлення</h1>
     </div>
 
+    <div class="glass-panel search-panel">
+        <input type="text" id="search-input" placeholder="🔍 Пошук інгредієнта..." oninput="handleSearch(this.value)">
+    </div>
+
     <div class="action-buttons">
         <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>Алфавіт</button>
         <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()"><span>✏️</span>Редагувати</button>
         <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити</button>
     </div>
 
-    <div class="glass-panel" id="list-panel">
-        <div class="list-container" id="items-list"></div>
-    </div>
+    <div id="lists-wrapper"></div>
 
     <div class="glass-panel">
         <div class="add-custom">
-            <input type="text" id="new-item-input" placeholder="Новий інгредієнт...">
-            <button class="btn-add" onclick="addNewItem()">Додати</button>
+            <div class="add-row">
+                <input type="text" id="new-item-input" placeholder="Новий інгредієнт...">
+                <button class="btn-add" onclick="addNewItem()">Додати</button>
+            </div>
+            <select id="new-item-category">
+                <option value="🐟 Риба та морепродукти">🐟 Риба та морепродукти</option>
+                <option value="🧀 Сири та бакалія">🧀 Сири та бакалія</option>
+                <option value="🥫 Соуси та приправи">🥫 Соуси та приправи</option>
+                <option value="📦 Пакування та інвентар">📦 Пакування та інвентар</option>
+            </select>
         </div>
     </div>
 
     <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
 
     <script>
-        const STORAGE_KEY = 'sushiHouseItems_v2';
+        const STORAGE_KEY = 'sushiHouseItems_v3';
         let isEditMode = false;
+        let currentSearch = '';
 
         const defaultItems = [
-            "Лосось", "Копчений лосось", "Креветки", "Вугор", 
-            "Крем-сир", "Кляр темпура", "Сухарі панко", "Соус Унагі", 
-            "Горіховий соус", "Устричний соус", "Імбир", "Васабі", 
-            "Бейбі восьминіг", "Сніжний краб", "Ікра масаго", 
-            "Бамбукові листя", "Мірін", "Кікоман", "Рисовий оцет", 
-            "Чука", "Норі", "Палички", "Фіксатори", "Рис", 
-            "Макісу", "Листя комбо"
+            { name: "Лосось", category: "🐟 Риба та морепродукти" },
+            { name: "Копчений лосось", category: "🐟 Риба та морепродукти" },
+            { name: "Креветки", category: "🐟 Риба та морепродукти" },
+            { name: "Вугор", category: "🐟 Риба та морепродукти" },
+            { name: "Бейбі восьминіг", category: "🐟 Риба та морепродукти" },
+            { name: "Сніжний краб", category: "🐟 Риба та морепродукти" },
+            { name: "Ікра масаго", category: "🐟 Риба та морепродукти" },
+            
+            { name: "Крем-сир", category: "🧀 Сири та бакалія" },
+            { name: "Кляр темпура", category: "🧀 Сири та бакалія" },
+            { name: "Сухарі панко", category: "🧀 Сири та бакалія" },
+            { name: "Чука", category: "🧀 Сири та бакалія" },
+            { name: "Норі", category: "🧀 Сири та бакалія" },
+            { name: "Рис", category: "🧀 Сири та бакалія" },
+            
+            { name: "Соус Унагі", category: "🥫 Соуси та приправи" },
+            { name: "Горіховий соус", category: "🥫 Соуси та приправи" },
+            { name: "Устричний соус", category: "🥫 Соуси та приправи" },
+            { name: "Імбир", category: "🥫 Соуси та приправи" },
+            { name: "Васабі", category: "🥫 Соуси та приправи" },
+            { name: "Мірін", category: "🥫 Соуси та приправи" },
+            { name: "Кікоман", category: "🥫 Соуси та приправи" },
+            { name: "Рисовий оцет", category: "🥫 Соуси та приправи" },
+            { name: "Листя комбо", category: "🥫 Соуси та приправи" },
+            
+            { name: "Бамбукові листя", category: "📦 Пакування та інвентар" },
+            { name: "Палички", category: "📦 Пакування та інвентар" },
+            { name: "Фіксатори", category: "📦 Пакування та інвентар" },
+            { name: "Макісу", category: "📦 Пакування та інвентар" }
         ];
 
         let appItems = [];
@@ -199,10 +255,8 @@
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
                 appItems = JSON.parse(savedData);
-                // Захист: якщо в старих даних не було властивості skipped
-                appItems.forEach(item => { if(item.skipped === undefined) item.skipped = false; });
             } else {
-                appItems = defaultItems.map(name => ({ name: name, count: '', skipped: false }));
+                appItems = defaultItems.map(item => ({ name: item.name, category: item.category, count: '', skipped: false }));
                 saveData();
             }
         }
@@ -211,56 +265,96 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
         }
 
-        // Визначаємо позицію (порядок) елемента
         function getOrder(item) {
-            if (item.skipped) return 3; // Пропущені (сірі) - в самий низ
-            if (item.count !== '' && Number(item.count) > 0) return 2; // Введені - передостанні
-            return 1; // Чисті, які ще треба заповнити - зверху
+            if (item.skipped) return 3; 
+            if (item.count !== '' && Number(item.count) > 0) return 2; 
+            return 1; 
         }
 
         function renderItems() {
-            const listContainer = document.getElementById('items-list');
-            listContainer.innerHTML = '';
+            const wrapper = document.getElementById('lists-wrapper');
+            wrapper.innerHTML = '';
 
-            appItems.forEach((item, index) => {
-                const row = document.createElement('div');
-                
-                let classes = 'item-row';
-                if (item.skipped) classes += ' skipped';
-                row.className = classes;
-                
-                row.style.order = getOrder(item);
-                row.id = 'item-row-' + index;
-                
-                row.innerHTML = `
-                    <div class="item-name">${item.name}</div>
-                    <div class="controls">
-                        <button class="btn-skip" onclick="toggleSkip(${index})">–</button>
-                        <input type="number" inputmode="numeric" min="0" placeholder="0" 
-                               value="${item.count}" 
-                               oninput="handleInput(${index}, this.value)"
-                               onblur="handleBlur(${index})">
-                        <span class="unit">шт</span>
-                    </div>
-                    <button class="delete-btn" onclick="deleteItem(${index})">✕</button>
-                `;
-                listContainer.appendChild(row);
+            const categories = [
+                "🐟 Риба та морепродукти", 
+                "🧀 Сири та бакалія", 
+                "🥫 Соуси та приправи", 
+                "📦 Пакування та інвентар"
+            ];
+
+            categories.forEach(cat => {
+                // Фільтруємо елементи для цієї категорії з урахуванням пошуку
+                const catItems = appItems.filter(item => {
+                    const matchesCat = item.category === cat;
+                    const matchesSearch = item.name.toLowerCase().includes(currentSearch.toLowerCase().trim());
+                    return matchesCat && matchesSearch;
+                });
+
+                // Якщо в категорії немає елементів для відображення - повністю ховаємо блок
+                if (catItems.length === 0) return;
+
+                const panel = document.createElement('div');
+                panel.className = 'glass-panel';
+
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.innerText = cat;
+                panel.appendChild(title);
+
+                const listContainer = document.createElement('div');
+                listContainer.className = 'list-container';
+
+                catItems.forEach(item => {
+                    // Знаходимо реальний індекс у глобальному масиві appItems
+                    const globalIndex = appItems.findIndex(i => i.name === item.name);
+
+                    const row = document.createElement('div');
+                    row.className = 'item-row' + (item.skipped ? ' skipped' : '');
+                    row.style.order = getOrder(item);
+                    row.id = 'item-row-' + globalIndex;
+                    
+                    row.innerHTML = `
+                        <div class="item-name">${item.name}</div>
+                        <div class="controls">
+                            <button class="btn-skip" onclick="toggleSkip(${globalIndex})">–</button>
+                            <input type="number" inputmode="numeric" min="0" placeholder="0" 
+                                   value="${item.count}" 
+                                   oninput="handleInput(${globalIndex}, this.value)"
+                                   onblur="handleBlur(${globalIndex})">
+                            <span class="unit">шт</span>
+                        </div>
+                        <button class="delete-btn" onclick="deleteItem(${globalIndex})">✕</button>
+                    `;
+                    listContainer.appendChild(row);
+                });
+
+                panel.appendChild(listContainer);
+                wrapper.appendChild(panel);
             });
+
+            // Оновлюємо стан режиму редагування для нових блоків
+            const btn = document.getElementById('edit-btn');
+            if (isEditMode) {
+                wrapper.classList.add('edit-mode');
+            } else {
+                wrapper.classList.remove('edit-mode');
+            }
         }
 
-        // Обробляємо ввід, але НЕ змінюємо позицію відразу (щоб не стрибало)
+        function handleSearch(value) {
+            currentSearch = value;
+            renderItems();
+        }
+
         function handleInput(index, value) {
             if (value < 0) value = 0;
             appItems[index].count = value;
-            
-            // Якщо ми щось ввели, пункт автоматично перестає бути "сірим"
             if (value !== '' && Number(value) > 0) {
                 appItems[index].skipped = false;
             }
             saveData();
         }
 
-        // Змінюємо позицію лише тоді, коли зняли фокус з поля
         function handleBlur(index) {
             const row = document.getElementById('item-row-' + index);
             if (row) {
@@ -269,28 +363,28 @@
             }
         }
 
-        // Функція для кнопки "–"
         function toggleSkip(index) {
             appItems[index].skipped = !appItems[index].skipped;
             if (appItems[index].skipped) {
-                appItems[index].count = ''; // Очищаємо цифру
+                appItems[index].count = '';
                 const row = document.getElementById('item-row-' + index);
                 if (row) row.querySelector('input').value = '';
             }
             saveData();
-            handleBlur(index); // Одразу оновлюємо вигляд і позицію
+            handleBlur(index);
         }
 
         function addNewItem() {
             const input = document.getElementById('new-item-input');
+            const catSelect = document.getElementById('new-item-category');
             const itemName = input.value.trim();
+            const category = catSelect.value;
 
             if (itemName !== "") {
-                appItems.push({ name: itemName, count: '', skipped: false });
+                appItems.push({ name: itemName, category: category, count: '', skipped: false });
                 saveData();
                 input.value = ''; 
                 renderItems(); 
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             }
         }
 
@@ -304,21 +398,20 @@
 
         function toggleEditMode() {
             isEditMode = !isEditMode;
-            const panel = document.getElementById('list-panel');
+            const wrapper = document.getElementById('lists-wrapper');
             const btn = document.getElementById('edit-btn');
             
             if (isEditMode) {
-                panel.classList.add('edit-mode');
+                wrapper.classList.add('edit-mode');
                 btn.classList.add('active');
                 btn.innerHTML = '<span>✓</span>Готово';
             } else {
-                panel.classList.remove('edit-mode');
+                wrapper.classList.remove('edit-mode');
                 btn.classList.remove('active');
                 btn.innerHTML = '<span>✏️</span>Редагувати';
             }
         }
 
-        // Очищення тепер знімає і цифри, і "сірі" статуси
         function clearCounts() {
             if (confirm('Очистити всі цифри та повернути список у початковий стан?')) {
                 appItems.forEach(item => {
