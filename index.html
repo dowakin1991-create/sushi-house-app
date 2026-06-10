@@ -174,19 +174,26 @@
         .btn-focus-skip { flex: 1; height: 56px; background: var(--input-bg); border: none; border-radius: 16px; color: var(--text-secondary); font-size: 17px; font-weight: 600; }
         .btn-focus-next { flex: 2; height: 56px; background: var(--accent); border: none; border-radius: 16px; color: white; font-size: 17px; font-weight: 600; box-shadow: 0 4px 12px rgba(255,107,0,0.3); }
 
-        /* --- iOS TOAST ДЛЯ UNDO --- */
+        /* --- ВІДРЕДАГОВАНИЙ iOS TOAST ДЛЯ UNDO --- */
         .undo-toast {
             position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 16px; right: 16px;
             height: 54px; background: rgba(0, 0, 0, 0.85); color: white;
             border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Фікс багу з визиранням: опускаємо на 150px вниз, прибираємо видимість і кліки */
+            transform: translateY(150px); opacity: 0; pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
             z-index: 1000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
         }
         @media (prefers-color-scheme: dark) {
             .undo-toast { background: rgba(255, 255, 255, 0.95); color: black; }
         }
-        .undo-toast.show { transform: translateY(0); }
+        /* Коли Toast активний, повертаємо його на місце */
+        .undo-toast.show { 
+            transform: translateY(0); 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
         .btn-undo-action { background: transparent; border: none; color: var(--accent); font-size: 15px; font-weight: 700; cursor: pointer; padding: 8px; }
 
         .add-custom { display: flex; flex-direction: column; gap: 10px; }
