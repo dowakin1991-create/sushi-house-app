@@ -80,21 +80,24 @@
         .progress-bar { width: 100%; height: 6px; background: var(--input-bg); border-radius: 3px; overflow: hidden; }
         #progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 3px; transition: width 0.3s ease; }
 
+        /* Кнопки меню */
         .action-buttons {
-            display: flex; justify-content: space-between; gap: 6px; margin-bottom: 16px;
+            display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px;
         }
 
         .btn-secondary {
             flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            color: var(--text-main); border-radius: 14px; padding: 10px 2px;
+            color: var(--text-main); border-radius: 14px; padding: 8px 2px;
             font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
             -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
             transition: opacity 0.2s, transform 0.1s;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; height: 52px;
+            gap: 4px; height: 55px;
         }
-        .btn-secondary span { font-size: 16px; }
+        .btn-secondary span { font-size: 18px; }
         .btn-secondary:active { opacity: 0.6; transform: scale(0.96); }
+        
+        .focus-btn { background: var(--accent); color: white; border-color: var(--accent); }
 
         .glass-panel {
             background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);
@@ -104,7 +107,7 @@
         }
 
         .category-title {
-            font-size: 14px; font-weight: 700; color: var(--accent);
+            font-size: 14px; font-weight: 800; color: var(--accent);
             margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
@@ -133,13 +136,14 @@
 
         .unit { font-size: 15px; color: var(--text-secondary); font-weight: 500; width: 24px; }
 
-        /* СТИЛІ ДЛЯ РЕЖИМУ ФОКУСУ (TINDER-КАРТКИ) */
+        /* --- СТИЛІ РЕЖИМУ ФОКУСУ (TINDER) --- */
         .focus-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 999; display: none;
             flex-direction: column; justify-content: space-between;
             padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 30px) 20px;
             animation: fadeIn 0.3s ease forwards;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 107, 0, 0.15) 0%, transparent 60%);
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -151,7 +155,7 @@
             position: relative; width: 100%; margin: 30px 0;
         }
         .focus-card {
-            width: 100%; max-width: 350px; height: 320px;
+            width: 100%; max-width: 350px; height: 340px;
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             border-radius: 30px; box-shadow: 0 15px 35px var(--shadow);
             -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
@@ -159,22 +163,22 @@
             text-align: center; position: absolute; will-change: transform, opacity;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
         }
-        .focus-card .card-cat { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
-        .focus-card .card-title { font-size: 26px; font-weight: 800; margin: 15px 0; color: var(--text-main); line-height: 1.2; }
+        .focus-card .card-cat { font-size: 14px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .focus-card .card-title { font-size: 28px; font-weight: 800; margin: 15px 0; color: var(--text-main); line-height: 1.2; }
         
         .focus-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .focus-card input[type="number"] { width: 110px; height: 54px; font-size: 28px; border-radius: 16px; }
-        .focus-card .unit { font-size: 20px; width: auto; }
+        .focus-card input[type="number"] { width: 120px; height: 60px; font-size: 32px; border-radius: 16px; background: var(--input-bg); }
+        .focus-card .unit { font-size: 22px; width: auto; color: var(--text-secondary); font-weight: 600; }
 
-        .focus-actions { display: flex; gap: 12px; width: 100%; max-width: 350px; }
-        .btn-focus-skip { flex: 1; height: 50px; background: var(--input-bg); border: none; border-radius: 16px; color: var(--text-secondary); font-size: 16px; font-weight: 600; }
-        .btn-focus-next { flex: 2; height: 50px; background: var(--accent); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(255,107,0,0.3); }
+        .focus-actions { display: flex; gap: 12px; width: 100%; max-width: 350px; margin: 0 auto; }
+        .btn-focus-skip { flex: 1; height: 56px; background: var(--input-bg); border: none; border-radius: 16px; color: var(--text-secondary); font-size: 17px; font-weight: 600; }
+        .btn-focus-next { flex: 2; height: 56px; background: var(--accent); border: none; border-radius: 16px; color: white; font-size: 17px; font-weight: 600; box-shadow: 0 4px 12px rgba(255,107,0,0.3); }
 
-        /* РОЗУМНИЙ iOS TOAST ДЛЯ UNDO */
+        /* --- iOS TOAST ДЛЯ UNDO --- */
         .undo-toast {
             position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 16px; right: 16px;
-            height: 50px; background: rgba(0, 0, 0, 0.85); color: white;
-            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            height: 54px; background: rgba(0, 0, 0, 0.85); color: white;
+            border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
             transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 1000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
@@ -231,9 +235,9 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-secondary" onclick="openFocusMode()"><span>🎯</span>Режим Фокусу</button>
-            <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>За алфавітом</button>
-            <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити все</button>
+            <button class="btn-secondary focus-btn" onclick="openFocusMode()"><span>🎯</span>Фокус</button>
+            <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>Алфавіт</button>
+            <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити</button>
         </div>
 
         <div id="lists-wrapper"></div>
@@ -258,7 +262,7 @@
 
     <div id="focus-ui" class="focus-overlay">
         <div class="focus-header">
-            <span style="font-weight:700; font-size:18px;">🎯 Швидкий Фокус</span>
+            <span style="font-weight:800; font-size:20px;">🎯 Фокус-режим</span>
             <button class="btn-close-focus" onclick="closeFocusMode()">Закрити</button>
         </div>
         
@@ -266,38 +270,40 @@
             </div>
 
         <div class="focus-actions">
-            <button class="btn-focus-skip" onclick="focusSkip()">Пропустити (–)</button>
-            <button class="btn-focus-next" onclick="focusNext()">Далі ✓</button>
+            <button class="btn-focus-skip" onclick="focusSkip()">Пропустити</button>
+            <button class="btn-focus-next" onclick="focusNext()">Записати ✓</button>
         </div>
     </div>
 
     <div id="undo-toast" class="undo-toast">
-        <span id="undo-toast-text">Дію виконано</span>
+        <span id="undo-toast-text" style="font-weight: 500; font-size: 15px;">Дію виконано</span>
         <button class="btn-undo-action" onclick="triggerUndo()">СКАСУВАТИ</button>
     </div>
 
     <script>
-        const STORAGE_KEY = 'sushiHouseItems_v5';
+        // Версія сховища (змінена для чистого старту)
+        const STORAGE_KEY = 'sushiHouseItems_v6';
         let currentSearch = '';
         let appItems = [];
-        let historyStack = []; // Стек для зберігання попередніх станів програми (Undo)
+        let historyStack = [];
         let toastTimeout = null;
 
-        // Початкові дані
         const defaultItems = [
-            { name: "Лосось", category: "🐟 Риба та морепродукти" },
-            { name: "Копчений лосось", category: "🐟 Риба та морепродукти" },
             { name: "Креветки", category: "🐟 Риба та морепродукти" },
             { name: "Вугор", category: "🐟 Риба та морепродукти" },
             { name: "Бейбі восьминіг", category: "🐟 Риба та морепродукти" },
-            { name: "Сніжний краб", category: "🐟 Риба та морепродукти" },
             { name: "Ікра масаго", category: "🐟 Риба та морепродукти" },
+            { name: "Лосось", category: "🐟 Риба та морепродукти" },
+            { name: "Копчений лосось", category: "🐟 Риба та морепродукти" },
+            { name: "Сніжний краб", category: "🐟 Риба та морепродукти" },
+            
             { name: "Крем-сир", category: "🧀 Сири та бакалія" },
             { name: "Кляр темпура", category: "🧀 Сири та бакалія" },
             { name: "Сухарі панко", category: "🧀 Сири та бакалія" },
             { name: "Чука", category: "🧀 Сири та бакалія" },
             { name: "Норі", category: "🧀 Сири та бакалія" },
             { name: "Рис", category: "🧀 Сири та бакалія" },
+            
             { name: "Соус Унагі", category: "🥫 Соуси та приправи" },
             { name: "Горіховий соус", category: "🥫 Соуси та приправи" },
             { name: "Устричний соус", category: "🥫 Соуси та приправи" },
@@ -307,6 +313,7 @@
             { name: "Кікоман", category: "🥫 Соуси та приправи" },
             { name: "Рисовий оцет", category: "🥫 Соуси та приправи" },
             { name: "Листя комбо", category: "🥫 Соуси та приправи" },
+            
             { name: "Бамбукові листя", category: "📦 Пакування та інвентар" },
             { name: "Палички", category: "📦 Пакування та інвентар" },
             { name: "Фіксатори", category: "📦 Пакування та інвентар" },
@@ -327,9 +334,9 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
         }
 
-        // Збереження знімка стану перед будь-якою зміною для роботи Undo
+        // --- ЛОГІКА UNDO ---
         function pushToHistory(msg = "Зміни збережено") {
-            if (historyStack.length >= 5) historyStack.shift(); // Тримаємо максимум 5 кроків назад
+            if (historyStack.length >= 10) historyStack.shift();
             historyStack.push(JSON.stringify(appItems));
             showUndoToast(msg);
         }
@@ -339,7 +346,7 @@
             document.getElementById('undo-toast-text').innerText = msg;
             toast.classList.add('show');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => toast.classList.remove('show'), 5000); // Сховати через 5 секунд
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
         function triggerUndo() {
@@ -348,12 +355,13 @@
                 saveData();
                 renderItems();
                 if(document.getElementById('focus-ui').style.display === 'flex') {
-                    renderFocusCard();
+                    openFocusMode(); // Перезапускаємо фокус-режим з відкоченими даними
                 }
                 document.getElementById('undo-toast').classList.remove('show');
             }
         }
 
+        // --- ЛОГІКА ВІДОБРАЖЕННЯ СПИСКУ ---
         function getOrder(item) {
             if (item.skipped) return 3; 
             if (item.count !== '' && Number(item.count) > 0) return 2; 
@@ -375,10 +383,7 @@
             const categories = ["🐟 Риба та морепродукти", "🧀 Сири та бакалія", "🥫 Соуси та приправи", "📦 Пакування та інвентар"];
 
             categories.forEach(cat => {
-                const catItems = appItems.filter(item => {
-                    return item.category === cat && item.name.toLowerCase().includes(currentSearch.toLowerCase().trim());
-                });
-
+                const catItems = appItems.filter(item => item.category === cat && item.name.toLowerCase().includes(currentSearch.toLowerCase().trim()));
                 if (catItems.length === 0) return;
 
                 const panel = document.createElement('div');
@@ -426,9 +431,7 @@
         function handleInput(index, value) {
             if (value < 0) value = 0;
             appItems[index].count = value;
-            if (value !== '' && Number(value) > 0) {
-                appItems[index].skipped = false;
-            }
+            if (value !== '' && Number(value) > 0) appItems[index].skipped = false;
             saveData();
             updateProgress();
         }
@@ -442,7 +445,7 @@
         }
 
         function toggleSkip(index) {
-            pushToHistory(`Змінено статус: ${appItems[index].name}`);
+            pushToHistory(`Пропущено: ${appItems[index].name}`);
             appItems[index].skipped = !appItems[index].skipped;
             if (appItems[index].skipped) appItems[index].count = '';
             saveData();
@@ -470,28 +473,29 @@
         }
 
         function clearCounts() {
-            pushToHistory("Усі кількості очищено");
-            appItems.forEach(item => { item.count = ''; item.skipped = false; });
-            saveData();
-            renderItems();
+            if(confirm("Очистити всі введені цифри?")) {
+                pushToHistory("Очищено весь список");
+                appItems.forEach(item => { item.count = ''; item.skipped = false; });
+                saveData();
+                renderItems();
+            }
         }
 
         function sortItems() {
-            pushToHistory("Список відсортовано за алфавітом");
+            pushToHistory("Відсортовано за алфавітом");
             appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
             saveData();
             renderItems();
         }
 
-        // --- ЛОГІКА РЕЖИМУ ФОКУСУ (TINDER-КАРТКИ) ---
+        // --- ЛОГІКА РЕЖИМУ ФОКУСУ ---
         let focusItems = [];
         let currentFocusIdx = 0;
 
         function openFocusMode() {
-            // Фільтруємо лише неперевірені інгредієнти
             focusItems = appItems.filter(item => item.count === '' && !item.skipped);
             if (focusItems.length === 0) {
-                alert("Усі інгредієнти вже перевірені! Немає що фокусувати.");
+                alert("Усі інгредієнти перевірені! Немає що фокусувати.");
                 return;
             }
             currentFocusIdx = 0;
@@ -499,7 +503,7 @@
             document.getElementById('focus-ui').style.display = 'flex';
             renderFocusCard();
             
-            // Запит на дозвіл акселерометра iOS (для Шейк-Undo) під час кліку
+            // Запит акселерометра (для iOS 13+)
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 DeviceMotionEvent.requestPermission().catch(() => {});
             }
@@ -516,11 +520,11 @@
             container.innerHTML = '';
 
             if (currentFocusIdx >= focusItems.length) {
-                container.innerHTML = `<div class="focus-card" style="position:relative; justify-content:center; gap:15px;">
-                    <span style="font-size:50px;">🎉</span>
-                    <h2 class="card-title">Робота завершена!</h2>
-                    <p style="color:var(--text-secondary); font-weight:600;">Усі продукти опрацьовано на 100%.</p>
-                    <button class="btn-focus-next" style="width:80%; margin-top:15px;" onclick="closeFocusMode()">До списку</button>
+                container.innerHTML = `<div class="focus-card" style="justify-content:center; gap:20px;">
+                    <span style="font-size:60px;">🎉</span>
+                    <h2 class="card-title">Готово!</h2>
+                    <p style="color:var(--text-secondary); font-size: 16px;">Усі позиції опрацьовано.</p>
+                    <button class="btn-focus-next" style="width:100%; margin-top:20px;" onclick="closeFocusMode()">До списку</button>
                 </div>`;
                 document.querySelector('.focus-actions').style.display = 'none';
                 return;
@@ -541,27 +545,31 @@
                            value="${item.count}" oninput="handleInput(${globalIndex}, this.value)">
                     <span class="unit">шт</span>
                 </div>
-                <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Картка ${currentFocusIdx + 1} з ${focusItems.length}</div>
+                <div style="font-size:14px; color:var(--text-secondary); font-weight:600;">Залишилось: ${focusItems.length - currentFocusIdx}</div>
             `;
             container.appendChild(card);
             
-            // Автофокус на поле вводу та відкриття цифрової клавіатури
-            setTimeout(() => document.getElementById('focus-input').focus(), 300);
+            // Легка затримка перед фокусом, щоб клавіатура з'явилася плавно
+            setTimeout(() => {
+                const inp = document.getElementById('focus-input');
+                if(inp) inp.focus();
+            }, 300);
+            
             initCardSwipe(card);
         }
 
         function focusNext() {
             const input = document.getElementById('focus-input');
             if (input && input.value !== '' && Number(input.value) > 0) {
-                // Якщо введена цифра, то йдемо далі
+                pushToHistory(`Введено: ${focusItems[currentFocusIdx].name} (${input.value} шт)`);
                 animateCard('left');
             } else {
-                // Якщо пустий, вважаємо за пропущений (–)
                 focusSkip();
             }
         }
 
         function focusSkip() {
+            pushToHistory(`Пропущено: ${focusItems[currentFocusIdx].name}`);
             const item = focusItems[currentFocusIdx];
             const globalIndex = appItems.findIndex(i => i.name === item.name);
             appItems[globalIndex].skipped = true;
@@ -573,20 +581,16 @@
         function animateCard(direction) {
             const card = document.getElementById('active-focus-card');
             if (!card) return;
-            
             card.style.transform = direction === 'left' ? 'translateX(-150%) rotate(-15deg)' : 'translateX(150%) rotate(15deg)';
             card.style.opacity = '0';
-            
             setTimeout(() => {
                 currentFocusIdx++;
                 renderFocusCard();
             }, 300);
         }
 
-        // Свайпи для Tinder-картки в режимі Фокусу
         function initCardSwipe(card) {
             let startX = 0;
-            let cardY = 0;
             card.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
                 card.style.transition = 'none';
@@ -603,28 +607,21 @@
                 card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
                 const finalX = e.changedTouches[0].clientX - startX;
                 if (e.target.tagName !== 'INPUT') {
-                    if (finalX > 100) {
-                        focusSkip(); // Свайп вправо - пропуск
-                    } else if (finalX < -100) {
+                    if (finalX > 100) focusSkip(); 
+                    else if (finalX < -100) {
                         const globalIndex = appItems.findIndex(i => i.name === focusItems[currentFocusIdx].name);
-                        if (appItems[globalIndex].count !== '') {
-                            animateCard('left'); // Свайп вліво - зберегти в замовлення
-                        } else {
-                            card.style.transform = '';
-                        }
-                    } else {
-                        card.style.transform = '';
-                    }
+                        if (appItems[globalIndex].count !== '') animateCard('left');
+                        else card.style.transform = '';
+                    } else card.style.transform = '';
                 }
             });
         }
 
-
-        // --- ШАСІ ОБРОБКИ ЖЕСТІВ (ГОЛОВНИЙ СПИСОК) ---
+        // --- ЖЕСТИ ГОЛОВНОГО СПИСКУ (СВАЙПИ ВЛІВО/ВПРАВО) ---
         let touchStartX = 0; let touchStartY = 0; let activeRow = null; let isSwiping = false;
-        const wrapper = document.getElementById('lists-wrapper');
+        const wrapperEl = document.getElementById('lists-wrapper');
         
-        wrapper.addEventListener('touchstart', (e) => {
+        wrapperEl.addEventListener('touchstart', (e) => {
             if (e.target.tagName === 'INPUT') return;
             const row = e.target.closest('.item-row');
             if (!row) return;
@@ -632,7 +629,7 @@
             activeRow.style.transition = 'none'; isSwiping = false;
         }, { passive: true });
 
-        wrapper.addEventListener('touchmove', (e) => {
+        wrapperEl.addEventListener('touchmove', (e) => {
             if (!activeRow || isSwiping === false && Math.abs(e.touches[0].clientY - touchStartY) > 10) return;
             const dX = e.touches[0].clientX - touchStartX;
             if (Math.abs(dX) > 10) isSwiping = true;
@@ -645,40 +642,35 @@
             }
         }, { passive: true });
 
-        wrapper.addEventListener('touchend', (e) => {
+        wrapperEl.addEventListener('touchend', (e) => {
             if (!activeRow) return;
             activeRow.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease';
             activeRow.style.transform = ''; activeRow.style.backgroundColor = '';
             const dX = e.changedTouches[0].clientX - touchStartX;
             const index = parseInt(activeRow.id.replace('item-row-', ''));
             if (isSwiping) {
-                if (dX > 65) toggleSkip(index); // Свайп вправо - сірий/пропуск
-                else if (dX < -65) deleteItem(index); // Свайп ліворуч - видалення
+                if (dX > 65) toggleSkip(index);
+                else if (dX < -65) {
+                    if(confirm("Видалити повністю?")) deleteItem(index);
+                }
             }
             activeRow = null; isSwiping = false;
         });
 
-
-        // --- ФІШКА APPLE: SHAKE TO UNDO (СТРУШУВАННЯ ТЕЛЕФОНУ) ---
+        // --- SHAKE TO UNDO ---
         let lastShakeTime = 0;
         window.addEventListener('devicemotion', (e) => {
             const acc = e.accelerationIncludingGravity;
             if (!acc) return;
-            
             const speed = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
             const now = Date.now();
-            
-            // Якщо сила руху велика і пройшло понад 1.5 сек від минулого струшування
-            if (speed > 25 && (now - lastShakeTime > 1500)) {
+            if (speed > 20 && (now - lastShakeTime > 2000)) {
                 if (historyStack.length > 0) {
                     lastShakeTime = now;
-                    if (confirm("🚨 Бажаєш скасувати останню дію в додатку?")) {
-                        triggerUndo();
-                    }
+                    if (confirm("🚨 Повернути список на крок назад?")) triggerUndo();
                 }
             }
         });
-
 
         function sendToViber() {
             let messageText = "Замовлення СушіХаус\n\n";
@@ -691,12 +683,13 @@
                 }
             });
             if (!hasOrders) {
-                alert("Будь ласка, вкажіть кількість хоча б для одного інгредієнта!");
+                alert("Вкажіть кількість хоча б для одного інгредієнта!");
                 return;
             }
             window.location.href = `viber://forward?text=${encodeURIComponent(messageText)}`;
         }
 
+        // Запуск
         loadData();
         renderItems();
     </script>
