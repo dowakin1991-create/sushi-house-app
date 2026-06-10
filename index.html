@@ -77,8 +77,7 @@
             gap: 4px; height: 50px;
         }
         
-        .btn-secondary span { font-size: 18px; } /* Розмір емодзі */
-        
+        .btn-secondary span { font-size: 18px; }
         .btn-secondary:active { opacity: 0.6; }
         .btn-secondary.active { color: var(--danger); border-color: var(--danger); }
 
@@ -94,14 +93,26 @@
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
             padding-bottom: 12px; border-bottom: 1px solid var(--item-border);
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .item-row:last-child { border-bottom: none; padding-bottom: 0; }
 
+        /* Стилі для пропущених інгредієнтів (сірі) */
+        .item-row.skipped {
+            opacity: 0.35;
+        }
+
         .item-name { font-size: 17px; font-weight: 500; flex: 1; }
 
         .controls { display: flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
+
+        .btn-skip {
+            width: 36px; height: 36px; background: var(--input-bg); border: none;
+            border-radius: 10px; color: var(--text-secondary); font-size: 20px; font-weight: 500;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
+        .btn-skip:active { opacity: 0.5; }
 
         input[type="number"] {
             width: 60px; height: 36px; background: var(--input-bg); border: none;
@@ -169,7 +180,7 @@
     <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
 
     <script>
-        const STORAGE_KEY = 'sushiHouseItems_v1';
+        const STORAGE_KEY = 'sushiHouseItems_v2';
         let isEditMode = false;
 
         const defaultItems = [
@@ -188,8 +199,10 @@
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
                 appItems = JSON.parse(savedData);
+                // Захист: якщо в старих даних не було властивості skipped
+                appItems.forEach(item => { if(item.skipped === undefined) item.skipped = false; });
             } else {
-                appItems = defaultItems.map(name => ({ name: name, count: '' }));
+                appItems = defaultItems.map(name => ({ name: name, count: '', skipped: false }));
                 saveData();
             }
         }
@@ -198,20 +211,35 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
         }
 
+        // Визначаємо позицію (порядок) елемента
+        function getOrder(item) {
+            if (item.skipped) return 3; // Пропущені (сірі) - в самий низ
+            if (item.count !== '' && Number(item.count) > 0) return 2; // Введені - передостанні
+            return 1; // Чисті, які ще треба заповнити - зверху
+        }
+
         function renderItems() {
             const listContainer = document.getElementById('items-list');
             listContainer.innerHTML = '';
 
             appItems.forEach((item, index) => {
                 const row = document.createElement('div');
-                row.className = 'item-row';
+                
+                let classes = 'item-row';
+                if (item.skipped) classes += ' skipped';
+                row.className = classes;
+                
+                row.style.order = getOrder(item);
+                row.id = 'item-row-' + index;
                 
                 row.innerHTML = `
                     <div class="item-name">${item.name}</div>
                     <div class="controls">
+                        <button class="btn-skip" onclick="toggleSkip(${index})">–</button>
                         <input type="number" inputmode="numeric" min="0" placeholder="0" 
                                value="${item.count}" 
-                               oninput="updateCount(${index}, this.value)">
+                               oninput="handleInput(${index}, this.value)"
+                               onblur="handleBlur(${index})">
                         <span class="unit">шт</span>
                     </div>
                     <button class="delete-btn" onclick="deleteItem(${index})">✕</button>
@@ -220,10 +248,37 @@
             });
         }
 
-        function updateCount(index, value) {
+        // Обробляємо ввід, але НЕ змінюємо позицію відразу (щоб не стрибало)
+        function handleInput(index, value) {
             if (value < 0) value = 0;
             appItems[index].count = value;
+            
+            // Якщо ми щось ввели, пункт автоматично перестає бути "сірим"
+            if (value !== '' && Number(value) > 0) {
+                appItems[index].skipped = false;
+            }
             saveData();
+        }
+
+        // Змінюємо позицію лише тоді, коли зняли фокус з поля
+        function handleBlur(index) {
+            const row = document.getElementById('item-row-' + index);
+            if (row) {
+                row.style.order = getOrder(appItems[index]);
+                row.className = 'item-row' + (appItems[index].skipped ? ' skipped' : '');
+            }
+        }
+
+        // Функція для кнопки "–"
+        function toggleSkip(index) {
+            appItems[index].skipped = !appItems[index].skipped;
+            if (appItems[index].skipped) {
+                appItems[index].count = ''; // Очищаємо цифру
+                const row = document.getElementById('item-row-' + index);
+                if (row) row.querySelector('input').value = '';
+            }
+            saveData();
+            handleBlur(index); // Одразу оновлюємо вигляд і позицію
         }
 
         function addNewItem() {
@@ -231,11 +286,10 @@
             const itemName = input.value.trim();
 
             if (itemName !== "") {
-                appItems.push({ name: itemName, count: '' });
+                appItems.push({ name: itemName, count: '', skipped: false });
                 saveData();
                 input.value = ''; 
                 renderItems(); 
-                
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             }
         }
@@ -264,18 +318,20 @@
             }
         }
 
+        // Очищення тепер знімає і цифри, і "сірі" статуси
         function clearCounts() {
-            if (confirm('Очистити всі введені кількості?')) {
-                appItems.forEach(item => item.count = '');
+            if (confirm('Очистити всі цифри та повернути список у початковий стан?')) {
+                appItems.forEach(item => {
+                    item.count = '';
+                    item.skipped = false;
+                });
                 saveData();
                 renderItems();
             }
         }
 
-        // Нова функція сортування
         function sortItems() {
             if (confirm('Відсортувати всі інгредієнти за алфавітом?')) {
-                // localeCompare з 'uk' гарантує правильне сортування українських літер
                 appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
                 saveData();
                 renderItems();
@@ -288,7 +344,7 @@
 
             appItems.forEach(item => {
                 const count = parseInt(item.count);
-                if (!isNaN(count) && count > 0) {
+                if (!isNaN(count) && count > 0 && !item.skipped) {
                     messageText += `${item.name}: ${count} шт\n`;
                     hasOrders = true;
                 }
