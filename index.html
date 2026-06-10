@@ -50,6 +50,7 @@
             min-height: 100vh;
             padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px) 16px;
             -webkit-overflow-scrolling: touch; 
+            overflow-x: hidden;
         }
 
         .header { text-align: center; margin-bottom: 16px; position: relative; }
@@ -64,15 +65,18 @@
         h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px;}
 
         /* Панель пошуку */
-        .search-panel {
-            padding: 2px;
-            margin-bottom: 16px;
-        }
+        .search-panel { padding: 2px; margin-bottom: 12px; }
         .search-panel input {
             width: 100%; height: 44px; background: var(--input-bg); border: none;
             border-radius: 14px; padding: 0 16px; color: var(--text-main); font-size: 16px;
             font-family: inherit;
         }
+
+        /* Панель прогрес-бару */
+        .progress-panel { padding: 12px 16px; margin-bottom: 16px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+        .progress-bar { width: 100%; height: 6px; background: var(--input-bg); border-radius: 3px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 3px; transition: width 0.3s ease; }
 
         .action-buttons {
             display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px;
@@ -81,16 +85,14 @@
         .btn-secondary {
             flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
             color: var(--text-main); border-radius: 14px; padding: 10px 2px;
-            font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
+            font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
             -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
             transition: opacity 0.2s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; height: 46px;
         }
-        
-        .btn-secondary span { font-size: 18px; }
+        .btn-secondary span { font-size: 16px; }
         .btn-secondary:active { opacity: 0.6; }
-        .btn-secondary.active { color: var(--danger); border-color: var(--danger); }
 
         .glass-panel {
             background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);
@@ -99,7 +101,6 @@
             transform: translateZ(0); 
         }
 
-        /* Стилі категорій */
         .category-title {
             font-size: 15px; font-weight: 700; color: var(--accent);
             margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
@@ -107,28 +108,24 @@
 
         .list-container { display: flex; flex-direction: column; gap: 12px; }
 
+        /* Рядок елемента оптимізований під жести */
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
             padding-bottom: 12px; border-bottom: 1px solid var(--item-border);
-            transition: opacity 0.3s ease;
+            will-change: transform, background-color;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, background-color 0.3s ease;
+            border-radius: 8px;
         }
 
         .item-row:last-child { border-bottom: none; padding-bottom: 0; }
         .item-row.skipped { opacity: 0.35; }
 
-        .item-name { font-size: 17px; font-weight: 500; flex: 1; padding-right: 8px; }
+        .item-name { font-size: 17px; font-weight: 500; flex: 1; padding-left: 4px; pointer-events: none; }
 
-        .controls { display: flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
-
-        .btn-skip {
-            width: 36px; height: 36px; background: var(--input-bg); border: none;
-            border-radius: 10px; color: var(--text-secondary); font-size: 20px; font-weight: 500;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-        }
-        .btn-skip:active { opacity: 0.5; }
+        .controls { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
 
         input[type="number"] {
-            width: 60px; height: 36px; background: var(--input-bg); border: none;
+            width: 65px; height: 36px; background: var(--input-bg); border: none;
             border-radius: 10px; color: var(--text-main); font-size: 17px;
             font-weight: 600; text-align: center; font-family: inherit; -moz-appearance: textfield;
         }
@@ -137,25 +134,12 @@
 
         .unit { font-size: 15px; color: var(--text-secondary); font-weight: 500; width: 24px; }
 
-        .delete-btn {
-            background: var(--danger); color: white; border: none; border-radius: 10px;
-            width: 36px; height: 36px; font-size: 18px; font-weight: bold;
-            display: none; justify-content: center; align-items: center; cursor: pointer;
-        }
-
-        /* Стан редагування */
-        .edit-mode .controls { display: none !important; }
-        .edit-mode .delete-btn { display: flex !important; }
-
         .add-custom { display: flex; flex-direction: column; gap: 10px; }
-        
         .add-row { display: flex; gap: 10px; }
-        
         .add-custom input[type="text"] {
             flex: 1; height: 44px; background: var(--input-bg); border: none;
             border-radius: 12px; padding: 0 16px; color: var(--text-main); font-size: 17px;
         }
-        
         .add-custom select {
             height: 44px; background: var(--input-bg); border: none;
             border-radius: 12px; padding: 0 8px; color: var(--text-main); font-size: 15px;
@@ -187,10 +171,19 @@
         <input type="text" id="search-input" placeholder="🔍 Пошук інгредієнта..." oninput="handleSearch(this.value)">
     </div>
 
+    <div class="glass-panel progress-panel">
+        <div class="progress-info">
+            <span>📊 Прогрес перевірки</span>
+            <span id="progress-text">0 / 0</span>
+        </div>
+        <div class="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
     <div class="action-buttons">
-        <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>Алфавіт</button>
-        <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()"><span>✏️</span>Редагувати</button>
-        <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити</button>
+        <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>За алфавітом</button>
+        <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити все</button>
     </div>
 
     <div id="lists-wrapper"></div>
@@ -213,8 +206,7 @@
     <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
 
     <script>
-        const STORAGE_KEY = 'sushiHouseItems_v3';
-        let isEditMode = false;
+        const STORAGE_KEY = 'sushiHouseItems_v4';
         let currentSearch = '';
 
         const defaultItems = [
@@ -271,6 +263,16 @@
             return 1; 
         }
 
+        // Оновлення індикатора прогресу
+        function updateProgress() {
+            const total = appItems.length;
+            const processed = appItems.filter(item => item.skipped || (item.count !== '' && Number(item.count) > 0)).length;
+            
+            document.getElementById('progress-text').innerText = `${processed} / ${total}`;
+            const percentage = total > 0 ? (processed / total) * 100 : 0;
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+        }
+
         function renderItems() {
             const wrapper = document.getElementById('lists-wrapper');
             wrapper.innerHTML = '';
@@ -283,14 +285,12 @@
             ];
 
             categories.forEach(cat => {
-                // Фільтруємо елементи для цієї категорії з урахуванням пошуку
                 const catItems = appItems.filter(item => {
                     const matchesCat = item.category === cat;
                     const matchesSearch = item.name.toLowerCase().includes(currentSearch.toLowerCase().trim());
                     return matchesCat && matchesSearch;
                 });
 
-                // Якщо в категорії немає елементів для відображення - повністю ховаємо блок
                 if (catItems.length === 0) return;
 
                 const panel = document.createElement('div');
@@ -305,7 +305,6 @@
                 listContainer.className = 'list-container';
 
                 catItems.forEach(item => {
-                    // Знаходимо реальний індекс у глобальному масиві appItems
                     const globalIndex = appItems.findIndex(i => i.name === item.name);
 
                     const row = document.createElement('div');
@@ -316,14 +315,12 @@
                     row.innerHTML = `
                         <div class="item-name">${item.name}</div>
                         <div class="controls">
-                            <button class="btn-skip" onclick="toggleSkip(${globalIndex})">–</button>
                             <input type="number" inputmode="numeric" min="0" placeholder="0" 
                                    value="${item.count}" 
                                    oninput="handleInput(${globalIndex}, this.value)"
                                    onblur="handleBlur(${globalIndex})">
                             <span class="unit">шт</span>
                         </div>
-                        <button class="delete-btn" onclick="deleteItem(${globalIndex})">✕</button>
                     `;
                     listContainer.appendChild(row);
                 });
@@ -332,13 +329,7 @@
                 wrapper.appendChild(panel);
             });
 
-            // Оновлюємо стан режиму редагування для нових блоків
-            const btn = document.getElementById('edit-btn');
-            if (isEditMode) {
-                wrapper.classList.add('edit-mode');
-            } else {
-                wrapper.classList.remove('edit-mode');
-            }
+            updateProgress();
         }
 
         function handleSearch(value) {
@@ -353,6 +344,7 @@
                 appItems[index].skipped = false;
             }
             saveData();
+            updateProgress();
         }
 
         function handleBlur(index) {
@@ -371,7 +363,7 @@
                 if (row) row.querySelector('input').value = '';
             }
             saveData();
-            handleBlur(index);
+            renderItems();
         }
 
         function addNewItem() {
@@ -389,31 +381,15 @@
         }
 
         function deleteItem(index) {
-            if (confirm(`Видалити "${appItems[index].name}" зі списку?`)) {
+            if (confirm(`Видалити "${appItems[index].name}" зі списку повністю?`)) {
                 appItems.splice(index, 1);
                 saveData();
                 renderItems();
             }
         }
 
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const wrapper = document.getElementById('lists-wrapper');
-            const btn = document.getElementById('edit-btn');
-            
-            if (isEditMode) {
-                wrapper.classList.add('edit-mode');
-                btn.classList.add('active');
-                btn.innerHTML = '<span>✓</span>Готово';
-            } else {
-                wrapper.classList.remove('edit-mode');
-                btn.classList.remove('active');
-                btn.innerHTML = '<span>✏️</span>Редагувати';
-            }
-        }
-
         function clearCounts() {
-            if (confirm('Очистити всі цифри та повернути список у початковий стан?')) {
+            if (confirm('Очистити всі кількості та повернути список до початкового стану?')) {
                 appItems.forEach(item => {
                     item.count = '';
                     item.skipped = false;
@@ -424,7 +400,7 @@
         }
 
         function sortItems() {
-            if (confirm('Відсортувати всі інгредієнти за алфавітом?')) {
+            if (confirm('Відсортувати інгредієнти всередині категорій за алфавітом?')) {
                 appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
                 saveData();
                 renderItems();
@@ -451,6 +427,81 @@
             const encodedText = encodeURIComponent(messageText);
             window.location.href = `viber://forward?text=${encodedText}`;
         }
+
+        // --- ЛОГІКА iOS СВАЙП-ЖЕСТІВ (120Hz ОПТИМІЗАЦІЯ) ---
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let activeRow = null;
+        let isSwiping = false;
+
+        const wrapper = document.getElementById('lists-wrapper');
+        
+        wrapper.addEventListener('touchstart', (e) => {
+            const row = e.target.closest('.item-row');
+            if (!row) return;
+            activeRow = row;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            activeRow.style.transition = 'none'; // Вимикаємо анімацію під час руху пальця
+            isSwiping = false;
+        }, { passive: true });
+
+        wrapper.addEventListener('touchmove', (e) => {
+            if (!activeRow) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const dX = currentX - touchStartX;
+            const dY = currentY - touchStartY;
+
+            // Визначаємо, що це саме горизонтальний свайп, а не вертикальний скрол сторінки
+            if (!isSwiping && Math.abs(dX) > Math.abs(dY) && Math.abs(dX) > 10) {
+                isSwiping = true;
+            }
+
+            if (isSwiping) {
+                if (e.cancelable) e.preventDefault();
+                
+                // Еластичний опір при сильному свайпі (Apple Physics)
+                let translateX = dX;
+                if (dX > 100) translateX = 100 + (dX - 100) * 0.2;
+                if (dX < -100) translateX = -100 + (dX + 100) * 0.2;
+                
+                activeRow.style.transform = `translateX(${translateX}px)`;
+                
+                // Зміна фону для візуальної підказки дії
+                if (dX > 40) {
+                    activeRow.style.backgroundColor = 'rgba(255, 107, 0, 0.1)'; // Помаранчевий (пропуск)
+                } else if (dX < -40) {
+                    activeRow.style.backgroundColor = 'rgba(255, 59, 48, 0.1)'; // Червоний (видалення)
+                } else {
+                    activeRow.style.backgroundColor = '';
+                }
+            }
+        }, { passive: false });
+
+        wrapper.addEventListener('touchend', (e) => {
+            if (!activeRow) return;
+            
+            // Повертаємо плавну рідну анімацію повернення на місце
+            activeRow.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease';
+            activeRow.style.transform = '';
+            activeRow.style.backgroundColor = '';
+
+            const dX = e.changedTouches[0].clientX - touchStartX;
+            const index = parseInt(activeRow.id.replace('item-row-', ''));
+
+            if (isSwiping) {
+                if (dX > 75) {
+                    // Свайп праворуч -> пропустити (зробити сірим)
+                    toggleSkip(index);
+                } else if (dX < -75) {
+                    // Свайп ліворуч -> видалити повністю
+                    deleteItem(index);
+                }
+            }
+            activeRow = null;
+            isSwiping = false;
+        });
 
         loadData();
         renderItems();
