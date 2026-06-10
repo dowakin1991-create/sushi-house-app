@@ -20,6 +20,7 @@
             --text-secondary: #8e8e93;
             --accent: #ff6b00;
             --danger: #ff3b30;
+            --success: #34c759;
             --input-bg: rgba(0, 0, 0, 0.05);
             --item-border: rgba(0, 0, 0, 0.1);
             --shadow: rgba(0, 0, 0, 0.08);
@@ -34,6 +35,7 @@
                 --text-secondary: #ebebf5;
                 --accent: #ff8c33;
                 --danger: #ff453a;
+                --success: #30d158;
                 --input-bg: rgba(255, 255, 255, 0.1);
                 --item-border: rgba(255, 255, 255, 0.1);
                 --shadow: rgba(0, 0, 0, 0.5);
@@ -48,7 +50,7 @@
                               radial-gradient(circle at 100% 100%, rgba(255, 107, 0, 0.1) 0%, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
-            padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px) 16px;
+            padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 80px) 16px;
             -webkit-overflow-scrolling: touch; 
             overflow-x: hidden;
         }
@@ -79,20 +81,20 @@
         #progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 3px; transition: width 0.3s ease; }
 
         .action-buttons {
-            display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px;
+            display: flex; justify-content: space-between; gap: 6px; margin-bottom: 16px;
         }
 
         .btn-secondary {
             flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
             color: var(--text-main); border-radius: 14px; padding: 10px 2px;
-            font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
+            font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
             -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-            transition: opacity 0.2s;
-            display: flex; align-items: center; justify-content: center;
-            gap: 6px; height: 46px;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; height: 52px;
         }
         .btn-secondary span { font-size: 16px; }
-        .btn-secondary:active { opacity: 0.6; }
+        .btn-secondary:active { opacity: 0.6; transform: scale(0.96); }
 
         .glass-panel {
             background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border);
@@ -102,26 +104,23 @@
         }
 
         .category-title {
-            font-size: 15px; font-weight: 700; color: var(--accent);
+            font-size: 14px; font-weight: 700; color: var(--accent);
             margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         .list-container { display: flex; flex-direction: column; gap: 12px; }
 
-        /* Рядок елемента оптимізований під жести */
+        /* Рядки списку */
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
             padding-bottom: 12px; border-bottom: 1px solid var(--item-border);
             will-change: transform, background-color;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, background-color 0.3s ease;
-            border-radius: 8px;
         }
-
         .item-row:last-child { border-bottom: none; padding-bottom: 0; }
         .item-row.skipped { opacity: 0.35; }
 
         .item-name { font-size: 17px; font-weight: 500; flex: 1; padding-left: 4px; pointer-events: none; }
-
         .controls { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
 
         input[type="number"] {
@@ -133,6 +132,58 @@
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
         .unit { font-size: 15px; color: var(--text-secondary); font-weight: 500; width: 24px; }
+
+        /* СТИЛІ ДЛЯ РЕЖИМУ ФОКУСУ (TINDER-КАРТКИ) */
+        .focus-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 999; display: none;
+            flex-direction: column; justify-content: space-between;
+            padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 30px) 20px;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .focus-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .btn-close-focus { background: var(--input-bg); border: none; padding: 8px 16px; border-radius: 12px; color: var(--text-main); font-weight: 600; font-size: 15px; }
+
+        .card-container {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            position: relative; width: 100%; margin: 30px 0;
+        }
+        .focus-card {
+            width: 100%; max-width: 350px; height: 320px;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 30px; box-shadow: 0 15px 35px var(--shadow);
+            -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+            padding: 30px; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            text-align: center; position: absolute; will-change: transform, opacity;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        }
+        .focus-card .card-cat { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .focus-card .card-title { font-size: 26px; font-weight: 800; margin: 15px 0; color: var(--text-main); line-height: 1.2; }
+        
+        .focus-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .focus-card input[type="number"] { width: 110px; height: 54px; font-size: 28px; border-radius: 16px; }
+        .focus-card .unit { font-size: 20px; width: auto; }
+
+        .focus-actions { display: flex; gap: 12px; width: 100%; max-width: 350px; }
+        .btn-focus-skip { flex: 1; height: 50px; background: var(--input-bg); border: none; border-radius: 16px; color: var(--text-secondary); font-size: 16px; font-weight: 600; }
+        .btn-focus-next { flex: 2; height: 50px; background: var(--accent); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(255,107,0,0.3); }
+
+        /* РОЗУМНИЙ iOS TOAST ДЛЯ UNDO */
+        .undo-toast {
+            position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 16px; right: 16px;
+            height: 50px; background: rgba(0, 0, 0, 0.85); color: white;
+            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        }
+        @media (prefers-color-scheme: dark) {
+            .undo-toast { background: rgba(255, 255, 255, 0.95); color: black; }
+        }
+        .undo-toast.show { transform: translateY(0); }
+        .btn-undo-action { background: transparent; border: none; color: var(--accent); font-size: 15px; font-weight: 700; cursor: pointer; padding: 8px; }
 
         .add-custom { display: flex; flex-direction: column; gap: 10px; }
         .add-row { display: flex; gap: 10px; }
@@ -146,10 +197,7 @@
             font-family: inherit; flex: 1; -webkit-appearance: none;
         }
 
-        .btn-add {
-            height: 44px; background: var(--input-bg); color: var(--accent); border: none;
-            border-radius: 12px; padding: 0 20px; font-size: 17px; font-weight: 600;
-        }
+        .btn-add { height: 44px; background: var(--input-bg); color: var(--accent); border: none; border-radius: 12px; padding: 0 20px; font-size: 17px; font-weight: 600; }
 
         .btn-submit {
             width: 100%; height: 54px; background: var(--accent); color: #fff;
@@ -162,53 +210,80 @@
 </head>
 <body>
 
-    <div class="header">
-        <img src="IMG_0329.jpeg" alt="СушіХаус лого" class="logo">
-        <h1>Замовлення</h1>
-    </div>
-
-    <div class="glass-panel search-panel">
-        <input type="text" id="search-input" placeholder="🔍 Пошук інгредієнта..." oninput="handleSearch(this.value)">
-    </div>
-
-    <div class="glass-panel progress-panel">
-        <div class="progress-info">
-            <span>📊 Прогрес перевірки</span>
-            <span id="progress-text">0 / 0</span>
+    <div id="main-ui">
+        <div class="header">
+            <img src="IMG_0329.jpeg" alt="СушіХаус лого" class="logo">
+            <h1>Замовлення</h1>
         </div>
-        <div class="progress-bar">
-            <div id="progress-fill"></div>
+
+        <div class="glass-panel search-panel">
+            <input type="text" id="search-input" placeholder="🔍 Пошук інгредієнта..." oninput="handleSearch(this.value)">
         </div>
-    </div>
 
-    <div class="action-buttons">
-        <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>За алфавітом</button>
-        <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити все</button>
-    </div>
-
-    <div id="lists-wrapper"></div>
-
-    <div class="glass-panel">
-        <div class="add-custom">
-            <div class="add-row">
-                <input type="text" id="new-item-input" placeholder="Новий інгредієнт...">
-                <button class="btn-add" onclick="addNewItem()">Додати</button>
+        <div class="glass-panel progress-panel">
+            <div class="progress-info">
+                <span>📊 Прогрес перевірки</span>
+                <span id="progress-text">0 / 0</span>
             </div>
-            <select id="new-item-category">
-                <option value="🐟 Риба та морепродукти">🐟 Риба та морепродукти</option>
-                <option value="🧀 Сири та бакалія">🧀 Сири та бакалія</option>
-                <option value="🥫 Соуси та приправи">🥫 Соуси та приправи</option>
-                <option value="📦 Пакування та інвентар">📦 Пакування та інвентар</option>
-            </select>
+            <div class="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-secondary" onclick="openFocusMode()"><span>🎯</span>Режим Фокусу</button>
+            <button class="btn-secondary" onclick="sortItems()"><span>🔤</span>За алфавітом</button>
+            <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span>Очистити все</button>
+        </div>
+
+        <div id="lists-wrapper"></div>
+
+        <div class="glass-panel">
+            <div class="add-custom">
+                <div class="add-row">
+                    <input type="text" id="new-item-input" placeholder="Новий інгредієнт...">
+                    <button class="btn-add" onclick="addNewItem()">Додати</button>
+                </div>
+                <select id="new-item-category">
+                    <option value="🐟 Риба та морепродукти">🐟 Риба та морепродукти</option>
+                    <option value="🧀 Сири та бакалія">🧀 Сири та бакалія</option>
+                    <option value="🥫 Соуси та приправи">🥫 Соуси та приправи</option>
+                    <option value="📦 Пакування та інвентар">📦 Пакування та інвентар</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
+    </div>
+
+    <div id="focus-ui" class="focus-overlay">
+        <div class="focus-header">
+            <span style="font-weight:700; font-size:18px;">🎯 Швидкий Фокус</span>
+            <button class="btn-close-focus" onclick="closeFocusMode()">Закрити</button>
+        </div>
+        
+        <div class="card-container" id="card-container">
+            </div>
+
+        <div class="focus-actions">
+            <button class="btn-focus-skip" onclick="focusSkip()">Пропустити (–)</button>
+            <button class="btn-focus-next" onclick="focusNext()">Далі ✓</button>
         </div>
     </div>
 
-    <button class="btn-submit" onclick="sendToViber()">Надіслати у Viber</button>
+    <div id="undo-toast" class="undo-toast">
+        <span id="undo-toast-text">Дію виконано</span>
+        <button class="btn-undo-action" onclick="triggerUndo()">СКАСУВАТИ</button>
+    </div>
 
     <script>
-        const STORAGE_KEY = 'sushiHouseItems_v4';
+        const STORAGE_KEY = 'sushiHouseItems_v5';
         let currentSearch = '';
+        let appItems = [];
+        let historyStack = []; // Стек для зберігання попередніх станів програми (Undo)
+        let toastTimeout = null;
 
+        // Початкові дані
         const defaultItems = [
             { name: "Лосось", category: "🐟 Риба та морепродукти" },
             { name: "Копчений лосось", category: "🐟 Риба та морепродукти" },
@@ -217,14 +292,12 @@
             { name: "Бейбі восьминіг", category: "🐟 Риба та морепродукти" },
             { name: "Сніжний краб", category: "🐟 Риба та морепродукти" },
             { name: "Ікра масаго", category: "🐟 Риба та морепродукти" },
-            
             { name: "Крем-сир", category: "🧀 Сири та бакалія" },
             { name: "Кляр темпура", category: "🧀 Сири та бакалія" },
             { name: "Сухарі панко", category: "🧀 Сири та бакалія" },
             { name: "Чука", category: "🧀 Сири та бакалія" },
             { name: "Норі", category: "🧀 Сири та бакалія" },
             { name: "Рис", category: "🧀 Сири та бакалія" },
-            
             { name: "Соус Унагі", category: "🥫 Соуси та приправи" },
             { name: "Горіховий соус", category: "🥫 Соуси та приправи" },
             { name: "Устричний соус", category: "🥫 Соуси та приправи" },
@@ -234,14 +307,11 @@
             { name: "Кікоман", category: "🥫 Соуси та приправи" },
             { name: "Рисовий оцет", category: "🥫 Соуси та приправи" },
             { name: "Листя комбо", category: "🥫 Соуси та приправи" },
-            
             { name: "Бамбукові листя", category: "📦 Пакування та інвентар" },
             { name: "Палички", category: "📦 Пакування та інвентар" },
             { name: "Фіксатори", category: "📦 Пакування та інвентар" },
             { name: "Макісу", category: "📦 Пакування та інвентар" }
         ];
-
-        let appItems = [];
 
         function loadData() {
             const savedData = localStorage.getItem(STORAGE_KEY);
@@ -257,17 +327,42 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appItems));
         }
 
+        // Збереження знімка стану перед будь-якою зміною для роботи Undo
+        function pushToHistory(msg = "Зміни збережено") {
+            if (historyStack.length >= 5) historyStack.shift(); // Тримаємо максимум 5 кроків назад
+            historyStack.push(JSON.stringify(appItems));
+            showUndoToast(msg);
+        }
+
+        function showUndoToast(msg) {
+            const toast = document.getElementById('undo-toast');
+            document.getElementById('undo-toast-text').innerText = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 5000); // Сховати через 5 секунд
+        }
+
+        function triggerUndo() {
+            if (historyStack.length > 0) {
+                appItems = JSON.parse(historyStack.pop());
+                saveData();
+                renderItems();
+                if(document.getElementById('focus-ui').style.display === 'flex') {
+                    renderFocusCard();
+                }
+                document.getElementById('undo-toast').classList.remove('show');
+            }
+        }
+
         function getOrder(item) {
             if (item.skipped) return 3; 
             if (item.count !== '' && Number(item.count) > 0) return 2; 
             return 1; 
         }
 
-        // Оновлення індикатора прогресу
         function updateProgress() {
             const total = appItems.length;
             const processed = appItems.filter(item => item.skipped || (item.count !== '' && Number(item.count) > 0)).length;
-            
             document.getElementById('progress-text').innerText = `${processed} / ${total}`;
             const percentage = total > 0 ? (processed / total) * 100 : 0;
             document.getElementById('progress-fill').style.width = `${percentage}%`;
@@ -277,18 +372,11 @@
             const wrapper = document.getElementById('lists-wrapper');
             wrapper.innerHTML = '';
 
-            const categories = [
-                "🐟 Риба та морепродукти", 
-                "🧀 Сири та бакалія", 
-                "🥫 Соуси та приправи", 
-                "📦 Пакування та інвентар"
-            ];
+            const categories = ["🐟 Риба та морепродукти", "🧀 Сири та бакалія", "🥫 Соуси та приправи", "📦 Пакування та інвентар"];
 
             categories.forEach(cat => {
                 const catItems = appItems.filter(item => {
-                    const matchesCat = item.category === cat;
-                    const matchesSearch = item.name.toLowerCase().includes(currentSearch.toLowerCase().trim());
-                    return matchesCat && matchesSearch;
+                    return item.category === cat && item.name.toLowerCase().includes(currentSearch.toLowerCase().trim());
                 });
 
                 if (catItems.length === 0) return;
@@ -306,7 +394,6 @@
 
                 catItems.forEach(item => {
                     const globalIndex = appItems.findIndex(i => i.name === item.name);
-
                     const row = document.createElement('div');
                     row.className = 'item-row' + (item.skipped ? ' skipped' : '');
                     row.style.order = getOrder(item);
@@ -328,7 +415,6 @@
                 panel.appendChild(listContainer);
                 wrapper.appendChild(panel);
             });
-
             updateProgress();
         }
 
@@ -356,12 +442,9 @@
         }
 
         function toggleSkip(index) {
+            pushToHistory(`Змінено статус: ${appItems[index].name}`);
             appItems[index].skipped = !appItems[index].skipped;
-            if (appItems[index].skipped) {
-                appItems[index].count = '';
-                const row = document.getElementById('item-row-' + index);
-                if (row) row.querySelector('input').value = '';
-            }
+            if (appItems[index].skipped) appItems[index].count = '';
             saveData();
             renderItems();
         }
@@ -370,10 +453,9 @@
             const input = document.getElementById('new-item-input');
             const catSelect = document.getElementById('new-item-category');
             const itemName = input.value.trim();
-            const category = catSelect.value;
-
             if (itemName !== "") {
-                appItems.push({ name: itemName, category: category, count: '', skipped: false });
+                pushToHistory(`Додано: ${itemName}`);
+                appItems.push({ name: itemName, category: catSelect.value, count: '', skipped: false });
                 saveData();
                 input.value = ''; 
                 renderItems(); 
@@ -381,36 +463,226 @@
         }
 
         function deleteItem(index) {
-            if (confirm(`Видалити "${appItems[index].name}" зі списку повністю?`)) {
-                appItems.splice(index, 1);
-                saveData();
-                renderItems();
-            }
+            pushToHistory(`Видалено: ${appItems[index].name}`);
+            appItems.splice(index, 1);
+            saveData();
+            renderItems();
         }
 
         function clearCounts() {
-            if (confirm('Очистити всі кількості та повернути список до початкового стану?')) {
-                appItems.forEach(item => {
-                    item.count = '';
-                    item.skipped = false;
-                });
-                saveData();
-                renderItems();
-            }
+            pushToHistory("Усі кількості очищено");
+            appItems.forEach(item => { item.count = ''; item.skipped = false; });
+            saveData();
+            renderItems();
         }
 
         function sortItems() {
-            if (confirm('Відсортувати інгредієнти всередині категорій за алфавітом?')) {
-                appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
-                saveData();
-                renderItems();
+            pushToHistory("Список відсортовано за алфавітом");
+            appItems.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+            saveData();
+            renderItems();
+        }
+
+        // --- ЛОГІКА РЕЖИМУ ФОКУСУ (TINDER-КАРТКИ) ---
+        let focusItems = [];
+        let currentFocusIdx = 0;
+
+        function openFocusMode() {
+            // Фільтруємо лише неперевірені інгредієнти
+            focusItems = appItems.filter(item => item.count === '' && !item.skipped);
+            if (focusItems.length === 0) {
+                alert("Усі інгредієнти вже перевірені! Немає що фокусувати.");
+                return;
+            }
+            currentFocusIdx = 0;
+            document.getElementById('main-ui').style.display = 'none';
+            document.getElementById('focus-ui').style.display = 'flex';
+            renderFocusCard();
+            
+            // Запит на дозвіл акселерометра iOS (для Шейк-Undo) під час кліку
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission().catch(() => {});
             }
         }
+
+        function closeFocusMode() {
+            document.getElementById('focus-ui').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'block';
+            renderItems();
+        }
+
+        function renderFocusCard() {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            if (currentFocusIdx >= focusItems.length) {
+                container.innerHTML = `<div class="focus-card" style="position:relative; justify-content:center; gap:15px;">
+                    <span style="font-size:50px;">🎉</span>
+                    <h2 class="card-title">Робота завершена!</h2>
+                    <p style="color:var(--text-secondary); font-weight:600;">Усі продукти опрацьовано на 100%.</p>
+                    <button class="btn-focus-next" style="width:80%; margin-top:15px;" onclick="closeFocusMode()">До списку</button>
+                </div>`;
+                document.querySelector('.focus-actions').style.display = 'none';
+                return;
+            }
+
+            document.querySelector('.focus-actions').style.display = 'flex';
+            const item = focusItems[currentFocusIdx];
+            const globalIndex = appItems.findIndex(i => i.name === item.name);
+
+            const card = document.createElement('div');
+            card.className = 'focus-card';
+            card.id = 'active-focus-card';
+            card.innerHTML = `
+                <div class="card-cat">${item.category}</div>
+                <div class="card-title">${item.name}</div>
+                <div class="focus-input-wrapper">
+                    <input type="number" id="focus-input" inputmode="numeric" min="0" placeholder="0" 
+                           value="${item.count}" oninput="handleInput(${globalIndex}, this.value)">
+                    <span class="unit">шт</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Картка ${currentFocusIdx + 1} з ${focusItems.length}</div>
+            `;
+            container.appendChild(card);
+            
+            // Автофокус на поле вводу та відкриття цифрової клавіатури
+            setTimeout(() => document.getElementById('focus-input').focus(), 300);
+            initCardSwipe(card);
+        }
+
+        function focusNext() {
+            const input = document.getElementById('focus-input');
+            if (input && input.value !== '' && Number(input.value) > 0) {
+                // Якщо введена цифра, то йдемо далі
+                animateCard('left');
+            } else {
+                // Якщо пустий, вважаємо за пропущений (–)
+                focusSkip();
+            }
+        }
+
+        function focusSkip() {
+            const item = focusItems[currentFocusIdx];
+            const globalIndex = appItems.findIndex(i => i.name === item.name);
+            appItems[globalIndex].skipped = true;
+            appItems[globalIndex].count = '';
+            saveData();
+            animateCard('right');
+        }
+
+        function animateCard(direction) {
+            const card = document.getElementById('active-focus-card');
+            if (!card) return;
+            
+            card.style.transform = direction === 'left' ? 'translateX(-150%) rotate(-15deg)' : 'translateX(150%) rotate(15deg)';
+            card.style.opacity = '0';
+            
+            setTimeout(() => {
+                currentFocusIdx++;
+                renderFocusCard();
+            }, 300);
+        }
+
+        // Свайпи для Tinder-картки в режимі Фокусу
+        function initCardSwipe(card) {
+            let startX = 0;
+            let cardY = 0;
+            card.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                card.style.transition = 'none';
+            }, { passive: true });
+
+            card.addEventListener('touchmove', (e) => {
+                const moveX = e.touches[0].clientX - startX;
+                if (e.target.tagName !== 'INPUT') {
+                    card.style.transform = `translateX(${moveX}px) rotate(${moveX / 15}deg)`;
+                }
+            }, { passive: true });
+
+            card.addEventListener('touchend', (e) => {
+                card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
+                const finalX = e.changedTouches[0].clientX - startX;
+                if (e.target.tagName !== 'INPUT') {
+                    if (finalX > 100) {
+                        focusSkip(); // Свайп вправо - пропуск
+                    } else if (finalX < -100) {
+                        const globalIndex = appItems.findIndex(i => i.name === focusItems[currentFocusIdx].name);
+                        if (appItems[globalIndex].count !== '') {
+                            animateCard('left'); // Свайп вліво - зберегти в замовлення
+                        } else {
+                            card.style.transform = '';
+                        }
+                    } else {
+                        card.style.transform = '';
+                    }
+                }
+            });
+        }
+
+
+        // --- ШАСІ ОБРОБКИ ЖЕСТІВ (ГОЛОВНИЙ СПИСОК) ---
+        let touchStartX = 0; let touchStartY = 0; let activeRow = null; let isSwiping = false;
+        const wrapper = document.getElementById('lists-wrapper');
+        
+        wrapper.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            const row = e.target.closest('.item-row');
+            if (!row) return;
+            activeRow = row; touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+            activeRow.style.transition = 'none'; isSwiping = false;
+        }, { passive: true });
+
+        wrapper.addEventListener('touchmove', (e) => {
+            if (!activeRow || isSwiping === false && Math.abs(e.touches[0].clientY - touchStartY) > 10) return;
+            const dX = e.touches[0].clientX - touchStartX;
+            if (Math.abs(dX) > 10) isSwiping = true;
+            if (isSwiping) {
+                let translateX = dX;
+                if (dX > 80) translateX = 80 + (dX - 80) * 0.2;
+                if (dX < -80) translateX = -80 + (dX + 80) * 0.2;
+                activeRow.style.transform = `translateX(${translateX}px)`;
+                activeRow.style.backgroundColor = dX > 30 ? 'rgba(255, 107, 0, 0.1)' : (dX < -30 ? 'rgba(255, 59, 48, 0.1)' : '');
+            }
+        }, { passive: true });
+
+        wrapper.addEventListener('touchend', (e) => {
+            if (!activeRow) return;
+            activeRow.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease';
+            activeRow.style.transform = ''; activeRow.style.backgroundColor = '';
+            const dX = e.changedTouches[0].clientX - touchStartX;
+            const index = parseInt(activeRow.id.replace('item-row-', ''));
+            if (isSwiping) {
+                if (dX > 65) toggleSkip(index); // Свайп вправо - сірий/пропуск
+                else if (dX < -65) deleteItem(index); // Свайп ліворуч - видалення
+            }
+            activeRow = null; isSwiping = false;
+        });
+
+
+        // --- ФІШКА APPLE: SHAKE TO UNDO (СТРУШУВАННЯ ТЕЛЕФОНУ) ---
+        let lastShakeTime = 0;
+        window.addEventListener('devicemotion', (e) => {
+            const acc = e.accelerationIncludingGravity;
+            if (!acc) return;
+            
+            const speed = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+            const now = Date.now();
+            
+            // Якщо сила руху велика і пройшло понад 1.5 сек від минулого струшування
+            if (speed > 25 && (now - lastShakeTime > 1500)) {
+                if (historyStack.length > 0) {
+                    lastShakeTime = now;
+                    if (confirm("🚨 Бажаєш скасувати останню дію в додатку?")) {
+                        triggerUndo();
+                    }
+                }
+            }
+        });
+
 
         function sendToViber() {
             let messageText = "Замовлення СушіХаус\n\n";
             let hasOrders = false;
-
             appItems.forEach(item => {
                 const count = parseInt(item.count);
                 if (!isNaN(count) && count > 0 && !item.skipped) {
@@ -418,90 +690,12 @@
                     hasOrders = true;
                 }
             });
-
             if (!hasOrders) {
                 alert("Будь ласка, вкажіть кількість хоча б для одного інгредієнта!");
                 return;
             }
-
-            const encodedText = encodeURIComponent(messageText);
-            window.location.href = `viber://forward?text=${encodedText}`;
+            window.location.href = `viber://forward?text=${encodeURIComponent(messageText)}`;
         }
-
-        // --- ЛОГІКА iOS СВАЙП-ЖЕСТІВ (120Hz ОПТИМІЗАЦІЯ) ---
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let activeRow = null;
-        let isSwiping = false;
-
-        const wrapper = document.getElementById('lists-wrapper');
-        
-        wrapper.addEventListener('touchstart', (e) => {
-            const row = e.target.closest('.item-row');
-            if (!row) return;
-            activeRow = row;
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            activeRow.style.transition = 'none'; // Вимикаємо анімацію під час руху пальця
-            isSwiping = false;
-        }, { passive: true });
-
-        wrapper.addEventListener('touchmove', (e) => {
-            if (!activeRow) return;
-            const currentX = e.touches[0].clientX;
-            const currentY = e.touches[0].clientY;
-            const dX = currentX - touchStartX;
-            const dY = currentY - touchStartY;
-
-            // Визначаємо, що це саме горизонтальний свайп, а не вертикальний скрол сторінки
-            if (!isSwiping && Math.abs(dX) > Math.abs(dY) && Math.abs(dX) > 10) {
-                isSwiping = true;
-            }
-
-            if (isSwiping) {
-                if (e.cancelable) e.preventDefault();
-                
-                // Еластичний опір при сильному свайпі (Apple Physics)
-                let translateX = dX;
-                if (dX > 100) translateX = 100 + (dX - 100) * 0.2;
-                if (dX < -100) translateX = -100 + (dX + 100) * 0.2;
-                
-                activeRow.style.transform = `translateX(${translateX}px)`;
-                
-                // Зміна фону для візуальної підказки дії
-                if (dX > 40) {
-                    activeRow.style.backgroundColor = 'rgba(255, 107, 0, 0.1)'; // Помаранчевий (пропуск)
-                } else if (dX < -40) {
-                    activeRow.style.backgroundColor = 'rgba(255, 59, 48, 0.1)'; // Червоний (видалення)
-                } else {
-                    activeRow.style.backgroundColor = '';
-                }
-            }
-        }, { passive: false });
-
-        wrapper.addEventListener('touchend', (e) => {
-            if (!activeRow) return;
-            
-            // Повертаємо плавну рідну анімацію повернення на місце
-            activeRow.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease';
-            activeRow.style.transform = '';
-            activeRow.style.backgroundColor = '';
-
-            const dX = e.changedTouches[0].clientX - touchStartX;
-            const index = parseInt(activeRow.id.replace('item-row-', ''));
-
-            if (isSwiping) {
-                if (dX > 75) {
-                    // Свайп праворуч -> пропустити (зробити сірим)
-                    toggleSkip(index);
-                } else if (dX < -75) {
-                    // Свайп ліворуч -> видалити повністю
-                    deleteItem(index);
-                }
-            }
-            activeRow = null;
-            isSwiping = false;
-        });
 
         loadData();
         renderItems();
