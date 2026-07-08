@@ -12,7 +12,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* Глобальні змінні, які будуть динамічно змінюватися */
         :root {
             --bg-color: #f2f2f7;
             --glass-bg: rgba(255, 255, 255, 0.65);
@@ -23,7 +22,6 @@
             --item-border: rgba(0, 0, 0, 0.08);
             --shadow: rgba(0, 0, 0, 0.06);
             
-            /* Динамічний акцент (за замовчуванням Суші) */
             --accent: #ff6b00;
             --accent-glow: rgba(255, 107, 0, 0.2);
             --danger: #ff3b30;
@@ -51,7 +49,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            /* Динамічний градієнт фону */
             background-image: radial-gradient(circle at 10% 0%, var(--accent-glow) 0%, transparent 50%), 
                               radial-gradient(circle at 90% 100%, var(--accent-glow) 0%, transparent 50%);
             background-attachment: fixed;
@@ -62,7 +59,6 @@
             transition: background-image 0.6s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.6s ease;
         }
 
-        /* --- SPLASH SCREEN АНІМАЦІЯ --- */
         #splash-screen {
             position: fixed; inset: 0; z-index: 9999;
             background-color: var(--bg-color);
@@ -80,7 +76,6 @@
         }
         body.app-loaded #splash-screen { opacity: 0; transform: scale(1.1); visibility: hidden; }
 
-        /* Контейнер додатку для плавного появлення */
         #main-app { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         body.app-loaded #main-app { opacity: 1; transform: translateY(0); }
 
@@ -93,7 +88,6 @@
             backdrop-filter: blur(20px) saturate(180%); object-fit: cover;
         }
 
-        /* --- iOS 26 СЕГМЕНТНИЙ ПЕРЕМИКАЧ --- */
         .segmented-control {
             position: relative; display: flex; width: 100%; max-width: 360px;
             background: var(--input-bg); border-radius: 16px; padding: 4px; margin-bottom: 8px;
@@ -128,7 +122,19 @@
         .progress-bar { width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; overflow: hidden; }
         #progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 4px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.5s ease; }
 
-        /* Ультра-сучасне рідке скло */
+        /* Кнопки керування (Редагувати / Очистити) */
+        .action-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
+        .btn-secondary {
+            flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-main); border-radius: 16px; padding: 14px;
+            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        .btn-secondary:active { opacity: 0.6; transform: scale(0.96); }
+        .btn-secondary.active { color: var(--accent); border-color: var(--accent); }
+
         .glass-panel {
             background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border);
             -webkit-backdrop-filter: blur(40px) saturate(200%); backdrop-filter: blur(40px) saturate(200%);
@@ -144,7 +150,6 @@
 
         .list-container { display: flex; flex-direction: column; gap: 10px; }
 
-        /* Оптимізація рядків */
         .item-row {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap;
             padding: 10px 12px; background: transparent; border-radius: 16px; min-height: 54px;
@@ -156,6 +161,17 @@
         .item-name { font-size: 17px; font-weight: 600; flex: 1; padding-right: 8px; pointer-events: none; word-break: break-word; line-height: 1.2; letter-spacing: -0.3px; }
         
         .controls { display: flex; align-items: center; gap: 8px; pointer-events: auto; flex-shrink: 0; }
+        
+        .delete-btn {
+            background: var(--danger); color: white; border: none; border-radius: 12px;
+            width: 40px; height: 40px; font-size: 18px; font-weight: bold;
+            display: none; justify-content: center; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+        }
+
+        /* Режим редагування */
+        .edit-mode .controls { display: none !important; }
+        .edit-mode .delete-btn { display: flex !important; }
 
         input[type="number"] {
             width: 58px; height: 40px; background: var(--input-bg); border: none;
@@ -242,6 +258,11 @@
             </div>
         </div>
 
+        <div class="action-buttons">
+            <button class="btn-secondary" id="edit-btn" onclick="toggleEditMode()"><span>✏️</span> Редагувати</button>
+            <button class="btn-secondary" onclick="clearCounts()"><span>🔄</span> Очистити</button>
+        </div>
+
         <div id="lists-wrapper"></div>
 
         <div class="glass-panel">
@@ -263,18 +284,18 @@
     </div>
 
     <script>
-        const STORAGE_KEY_SUSHI = 'sushiItems_v10';
-        const STORAGE_KEY_RUD = 'rudItems_v10';
+        const STORAGE_KEY_SUSHI = 'sushiItems_v11';
+        const STORAGE_KEY_RUD = 'rudItems_v11';
         let currentTab = 'sushi'; 
         let currentSearch = '';
         let appItems = []; 
         let historyStack = [];
         let toastTimeout = null;
+        let isEditMode = false;
 
-        // Кольорові теми
         const THEME_SUSHI = { accent: '#ff6b00', glow: 'rgba(255, 107, 0, 0.2)' };
         const THEME_SUSHI_DARK = { accent: '#ff8c33', glow: 'rgba(255, 140, 51, 0.2)' };
-        const THEME_RUD = { accent: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.25)' }; // Морозний блакитний
+        const THEME_RUD = { accent: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.25)' };
         const THEME_RUD_DARK = { accent: '#38bdf8', glow: 'rgba(56, 189, 248, 0.25)' };
 
         const defaultSushi = [
@@ -321,12 +342,9 @@
 
         const unitsList = ['шт', 'кг', 'л', 'уп'];
 
-        // Запуск Splash Screen
         window.onload = () => {
-            setTimeout(() => {
-                document.body.classList.add('app-loaded');
-            }, 1800); // 1.8 секунди насолоди анімацією лого
-            switchTab('sushi'); // Ініціалізація
+            setTimeout(() => { document.body.classList.add('app-loaded'); }, 1800);
+            switchTab('sushi');
         };
 
         function getStorageKey() { return currentTab === 'sushi' ? STORAGE_KEY_SUSHI : STORAGE_KEY_RUD; }
@@ -349,7 +367,6 @@
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             const root = document.documentElement;
 
-            // Анімація повзунка
             if(tabId === 'rud') {
                 document.getElementById('segment-pill').style.transform = 'translateX(calc(100% + 8px))';
                 document.getElementById('btn-submit-main').innerText = 'Надіслати Рудь 🚀';
@@ -365,20 +382,21 @@
             document.getElementById('tab-sushi').classList.toggle('active', tabId === 'sushi');
             document.getElementById('tab-rud').classList.toggle('active', tabId === 'rud');
 
+            // Скидання пошуку та історії
             document.getElementById('search-input').value = '';
             currentSearch = '';
             historyStack = [];
             document.getElementById('undo-toast').classList.remove('show');
+            
+            // Вимикаємо режим редагування при перемиканні вкладки
+            if (isEditMode) toggleEditMode();
             
             updateCategorySelect();
             loadData();
             renderItems();
         }
 
-        // Слухаємо зміну теми телефону (світла/темна) в реальному часі для змінних
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            switchTab(currentTab); 
-        });
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { switchTab(currentTab); });
 
         function updateCategorySelect() {
             const select = document.getElementById('new-item-category');
@@ -394,7 +412,6 @@
             });
         }
 
-        // --- ЛОГІКА UNDO ---
         function pushToHistory(msg) {
             if (historyStack.length >= 10) historyStack.shift();
             historyStack.push(JSON.stringify(appItems));
@@ -430,6 +447,31 @@
             document.getElementById('progress-text').innerText = `${processed} / ${total}`;
             const percentage = total > 0 ? (processed / total) * 100 : 0;
             document.getElementById('progress-fill').style.width = `${percentage}%`;
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const wrapper = document.getElementById('lists-wrapper');
+            const btn = document.getElementById('edit-btn');
+            
+            if (isEditMode) {
+                wrapper.classList.add('edit-mode');
+                btn.classList.add('active');
+                btn.innerHTML = '<span>✓</span> Готово';
+            } else {
+                wrapper.classList.remove('edit-mode');
+                btn.classList.remove('active');
+                btn.innerHTML = '<span>✏️</span> Редагувати';
+            }
+        }
+
+        function clearCounts() {
+            if(confirm("Очистити всі введені цифри в цій вкладці?")) {
+                pushToHistory("Очищено весь список");
+                appItems.forEach(item => { item.count = ''; item.skipped = false; });
+                saveData();
+                renderItems();
+            }
         }
 
         function renderItems() {
@@ -479,6 +521,7 @@
                                 ${unitOptions}
                             </select>
                         </div>
+                        <button class="delete-btn" onclick="deleteItem(${globalIndex})">✕</button>
                     `;
                     listContainer.appendChild(row);
                 });
@@ -486,6 +529,10 @@
                 panel.appendChild(listContainer);
                 wrapper.appendChild(panel);
             });
+            
+            // Якщо редагування увімкнене, відновлюємо стан
+            if (isEditMode) wrapper.classList.add('edit-mode');
+            
             updateProgress();
         }
 
@@ -540,12 +587,11 @@
             renderItems();
         }
 
-        // --- ЖЕСТИ ГОЛОВНОГО СПИСКУ (СВАЙПИ) ---
         let touchStartX = 0; let touchStartY = 0; let activeRow = null; let isSwiping = false;
         const wrapperEl = document.getElementById('lists-wrapper');
         
         wrapperEl.addEventListener('touchstart', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            if (isEditMode || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
             const row = e.target.closest('.item-row');
             if (!row) return;
             activeRow = row; touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
@@ -562,12 +608,11 @@
                 if (dX < -80) translateX = -80 + (dX + 80) * 0.2;
                 activeRow.style.transform = `translateX(${translateX}px)`;
                 
-                // Колір фону під час свайпу використовує CSS-змінну --accent-glow
                 const glow = getComputedStyle(document.documentElement).getPropertyValue('--accent-glow');
                 if (dX > 30) {
                     activeRow.style.backgroundColor = glow;
                 } else if (dX < -30) {
-                    activeRow.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'; // Червоний для видалення
+                    activeRow.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'; 
                 } else {
                     activeRow.style.backgroundColor = '';
                 }
@@ -589,8 +634,6 @@
             activeRow = null; isSwiping = false;
         });
 
-        // --- SHAKE TO UNDO ---
-        let lastShakeTime = 0;
         window.addEventListener('devicemotion', (e) => {
             const acc = e.accelerationIncludingGravity;
             if (!acc) return;
@@ -603,15 +646,6 @@
                 }
             }
         });
-
-        function clearCounts() {
-            if(confirm("Очистити всі введені цифри в цій вкладці?")) {
-                pushToHistory("Очищено весь список");
-                appItems.forEach(item => { item.count = ''; item.skipped = false; });
-                saveData();
-                renderItems();
-            }
-        }
 
         function sendToViber() {
             let messageText = currentTab === 'sushi' ? "Замовлення СушіХаус\n\n" : "Замовлення Рудь\n\n";
